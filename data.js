@@ -77,6 +77,30 @@ const SEED_EXERCISES = [
   { id: 'giro-ruso-disco', name: 'Giro ruso con disco', muscle: 'Oblicuos externos', equipment: 'Disco',
     description: 'Sentada con el torso inclinado hacia atrás y los pies apoyados o elevados. Girá el torso llevando el disco de un lado al otro.' },
 
+  // ---- Versiones de gym (reemplazan ejercicios que eran de casa) ----
+  { id: 'peso-muerto-rumano-barra', name: 'Peso muerto rumano con barra', muscle: 'Glúteo mayor', equipment: 'Barra',
+    description: 'Barra en las manos al ancho de hombros, rodillas apenas flexionadas. Llevá la cadera hacia atrás bajando la barra pegada a las piernas hasta sentir estiramiento en los isquios, espalda recta. Subí empujando la cadera hacia adelante y apretando glúteos.' },
+  { id: 'zancada-atras-smith', name: 'Zancada hacia atrás en Smith', muscle: 'Glúteo mayor', equipment: 'Máquina Smith',
+    description: 'Barra del Smith sobre la espalda alta. Da un paso largo hacia atrás y bajá hasta que la rodilla de atrás casi toque el piso, torso levemente inclinado. Empujá con el talón de adelante para volver.' },
+  { id: 'patada-cuadrupedia-polea', name: 'Patada de glúteo en cuadrupedia con polea', muscle: 'Glúteo mayor', equipment: 'Polea baja + tobillera',
+    description: 'En cuatro apoyos frente a la polea baja, tobillera en un pie. Empujá el talón hacia atrás y arriba hasta extender la cadera, apretando el glúteo sin arquear la zona lumbar. Volvé controlado.' },
+  { id: 'hip-thrust-barra-liga', name: 'Hip thrust con barra y liga en rodillas', muscle: 'Glúteo mayor', equipment: 'Barra + banco + liga',
+    description: 'Espalda alta en el banco, barra sobre la cadera (con protector) y liga sobre las rodillas. Elevá la cadera empujando las rodillas hacia afuera contra la liga. Pausa arriba y bajá lento.' },
+  { id: 'glute-bridge-smith', name: 'Glute bridge en Smith', muscle: 'Glúteo mayor', equipment: 'Máquina Smith',
+    description: 'Acostada en el piso bajo el Smith, barra sobre la cadera y pies apoyados cerca de los glúteos. Elevá la cadera apretando glúteos, pausa arriba y bajá sin apoyar del todo.' },
+  { id: 'isometrico-prensa', name: 'Isométrico en prensa', muscle: 'Cuádriceps (Recto femoral)', equipment: 'Prensa',
+    description: 'En la prensa, bajá hasta que las rodillas queden a 90° y sostené la posición sin trabar ni apoyar los seguros, respirando normal. Al terminar, empujá para subir y trabá la máquina.' },
+  { id: 'face-pull', name: 'Face pull en polea', muscle: 'Deltoide posterior', equipment: 'Polea alta + cuerda',
+    description: 'Polea a la altura de la cara con cuerda. Tirá hacia la frente separando las manos y llevando los codos altos y hacia atrás. Volvé controlado.' },
+  { id: 'rotacion-externa-polea', name: 'Rotación externa en polea', muscle: 'Deltoide posterior', equipment: 'Polea a la altura del codo',
+    description: 'De costado a la polea, codo pegado al cuerpo y flexionado a 90°. Girá el antebrazo hacia afuera sin despegar el codo y volvé lento. Peso liviano.' },
+  { id: 'zancada-lateral-kettlebell', name: 'Zancada lateral con kettlebell', muscle: 'Aductor mayor', equipment: 'Kettlebell',
+    description: 'Kettlebell contra el pecho. Da un paso amplio hacia el costado, flexioná esa rodilla llevando la cadera atrás y dejá la otra pierna estirada. Empujá para volver al centro y alterná.' },
+  { id: 'elevacion-frontal-polea', name: 'Elevación frontal en polea', muscle: 'Deltoide anterior', equipment: 'Polea baja',
+    description: 'De espaldas a la polea baja con el agarre en una mano. Elevá el brazo estirado hacia adelante hasta la altura del hombro y bajá lento.' },
+  { id: 'remo-unilateral-polea', name: 'Remo unilateral en polea', muscle: 'Espalda (Dorsal ancho)', equipment: 'Polea',
+    description: 'Agarre en una mano, polea a la altura del pecho o más baja. Tirá llevando el codo hacia atrás pegado al cuerpo y juntá el omóplato. Volvé estirando el brazo sin girar el torso.' },
+
   // ---- Alternativas para "Cambiar" ----
   { id: 'hip-thrust-banco', name: 'Hip thrust en banco con disco', muscle: 'Glúteo mayor', equipment: 'Banco + disco',
     description: 'Parte alta de la espalda apoyada en un banco y un disco sobre la cadera. Elevá la cadera apretando glúteos hasta que el torso quede paralelo al piso.' },
@@ -114,28 +138,28 @@ const SEED_GYM_WEEKS = [
       ['farmer-walk', '', 'Al menos 50 pasos'],
     ],
     2: [
-      ['peso-muerto-mancuernas', '3', '12 reps'],
-      ['sentadilla-lunge', '3', '8 reps cada lado'],
-      ['side-kickback', '3', '12 reps por pierna'],
-      ['patada-hidrante', '3', '12 reps por pierna'],
-      ['bridge-diamante-liga', '3', '12 reps por pierna'],
-      ['bridge-brazos-extendidos', '3', '12 reps'],
-      ['wall-sit-peso', '3', '1 minuto'],
+      ['peso-muerto-rumano-barra', '3', '12 reps'],
+      ['zancada-atras-smith', '3', '8 reps cada lado'],
+      ['abductores-maquina', '3', '15 reps'],
+      ['patada-cuadrupedia-polea', '3', '12 reps por pierna'],
+      ['hip-thrust-barra-liga', '3', '12 reps'],
+      ['glute-bridge-smith', '3', '12 reps'],
+      ['isometrico-prensa', '3', '1 minuto'],
       ['estiramiento-tren-inferior', '', '1 minuto completo'],
     ],
     3: [
       ['jumping-jack-mancuernas', '3', '25 reps'],
       ['latpull-barra', '3', '15 reps'],
       ['pull-polea-triceps', '3', '15 reps por brazo'],
-      ['lat-pull-up-mancuernas', '3', '15 reps'],
-      ['rotacion-externa-hombro', '3', '10 reps por brazo'],
+      ['face-pull', '3', '15 reps'],
+      ['rotacion-externa-polea', '3', '10 reps por brazo'],
       ['hold-mancuerna-pierna', '3', '45-60 seg'],
       ['abs-around', '3', '12 vueltas'],
       ['plancha-elevacion-brazos', '3', '10 por brazo'],
     ],
     4: [
       ['caminata-squat', '3', '10 reps por pierna'],
-      ['side-to-side-squat', '3', '8 reps cada lado'],
+      ['zancada-lateral-kettlebell', '3', '8 reps cada lado'],
       ['leg-extension-maquina', '3', '12 reps'],
       ['polea-arriba', '3', 'Al fallo por pierna'],
       ['patada-gluteo-polea', '3', '15 reps por pierna'],
@@ -144,8 +168,8 @@ const SEED_GYM_WEEKS = [
     ],
     5: [
       ['plancha-lateral-cadera', '3', '10 reps'],
-      ['elevacion-frontal-liga', '3', '12 reps por brazo'],
-      ['remo-liga', '3', '12 reps por brazo'],
+      ['elevacion-frontal-polea', '3', '12 reps por brazo'],
+      ['remo-unilateral-polea', '3', '12 reps por brazo'],
       ['vuelos-laterales', '3', '12 reps'],
       ['complejo-press-disco', '5', ''],
       ['bear-plank-toque', '3', '12 reps'],
@@ -154,6 +178,22 @@ const SEED_GYM_WEEKS = [
     ],
   },
 ];
+
+// Reemplazos casa → gym, para actualizar programas ya guardados en el teléfono.
+const GYM_UPGRADES = {
+  'peso-muerto-mancuernas': ['peso-muerto-rumano-barra'],
+  'sentadilla-lunge': ['zancada-atras-smith'],
+  'side-kickback': ['abductores-maquina', '15 reps'],
+  'patada-hidrante': ['patada-cuadrupedia-polea'],
+  'bridge-diamante-liga': ['hip-thrust-barra-liga', '12 reps'],
+  'bridge-brazos-extendidos': ['glute-bridge-smith'],
+  'wall-sit-peso': ['isometrico-prensa'],
+  'lat-pull-up-mancuernas': ['face-pull'],
+  'rotacion-externa-hombro': ['rotacion-externa-polea'],
+  'side-to-side-squat': ['zancada-lateral-kettlebell'],
+  'elevacion-frontal-liga': ['elevacion-frontal-polea'],
+  'remo-liga': ['remo-unilateral-polea'],
+};
 
 const SEED_GYM_START = '2026-10-19';
 const SEED_GYM_TOTAL_WEEKS = 7;
