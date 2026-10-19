@@ -73,11 +73,20 @@ function migrate(s) {
   }
   if ((s.seedVersion || 0) < SEED_VERSION) {
     for (const [id, ex] of Object.entries(seedExercises())) if (!s.exercises[id]) s.exercises[id] = ex;
+    // Completa los días vacíos con lo nuevo del programa; los días con ejercicios no se tocan.
     const weeks = s.programs.gym.weeks;
     SEED_GYM_WEEKS.forEach((seed, i) => {
-      const isEmpty = w => !w || Object.values(w).every(d => !d.length);
-      if (i < weeks.length && isEmpty(weeks[i])) weeks[i] = weekFromSeed(seed);
+      if (i >= weeks.length) return;
+      const fresh = weekFromSeed(seed);
+      for (const d in seed) if (!weeks[i][d].length) weeks[i][d] = fresh[d];
     });
+    for (const add of SEED_APPENDS) {
+      const day = add.since > (s.seedVersion || 0) && weeks[add.week] && weeks[add.week][add.day];
+      if (!day || !day.length) continue;
+      for (const [exId, sets, reps] of add.items) {
+        if (!day.some(i => i.exId === exId)) day.push({ uid: uid(), exId, sets, reps });
+      }
+    }
     s.seedVersion = SEED_VERSION;
   }
   return s;

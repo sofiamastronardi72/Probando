@@ -199,6 +199,19 @@ const SEED_EXERCISES = [
     description: 'Boca arriba, brazos al techo y rodillas a 90°. Extendé brazo y pierna contrarios sin despegar la zona lumbar del piso. Alterná.' },
 ];
 
+// Sábado de core profundo, igual todas las semanas.
+const SATURDAY_CORE = [
+  ['respiracion-90-90', '2', '5 respiraciones lentas'],
+  ['dead-bug', '3', '8 reps por lado, lento'],
+  ['bird-dog', '3', '8 reps por lado'],
+  ['plancha-rkc', '3', '20-30 seg'],
+  ['plancha-lateral', '3', '30 seg por lado'],
+  ['pallof-press', '3', '10 reps por lado'],
+  ['hollow-hold', '3', '20-30 seg'],
+  ['stir-the-pot', '3', '6 círculos por lado'],
+  ['suitcase-carry', '3', '20 pasos por lado'],
+];
+
 // Programa Gym: una entrada por semana; cada semana tiene los días 1 (lunes) a 5 (viernes).
 // Cada ejercicio: [id, series, repeticiones].
 const SEED_GYM_WEEKS = [
@@ -211,6 +224,8 @@ const SEED_GYM_WEEKS = [
       ['femoral-polea-acostada', '3', '12 reps por pierna'],
       ['adductor-88', '4', '8-8'],
       ['farmer-walk', '', 'Al menos 50 pasos'],
+      ['lenador-polea', '3', '10 reps por lado'],
+      ['slam-medicine-ball', '3', '12 reps'],
     ],
     2: [
       ['peso-muerto-rumano-barra', '3', '12 reps'],
@@ -240,6 +255,8 @@ const SEED_GYM_WEEKS = [
       ['patada-gluteo-polea', '3', '15 reps por pierna'],
       ['extension-polea-lateral', '', ''],
       ['hip-thrust-maquina', '3', '12 reps + 10 chiquititos al final de cada serie'],
+      ['crunch-polea-alta', '3', '15 reps'],
+      ['giro-medicine-ball', '3', '12 reps por lado'],
     ],
     5: [
       ['plancha-lateral-cadera', '3', '10 reps'],
@@ -251,6 +268,7 @@ const SEED_GYM_WEEKS = [
       ['plancha-lateral-bosu', '3', '12 reps'],
       ['giro-ruso-disco', '3', '12 reps por lado'],
     ],
+    6: SATURDAY_CORE,
   },
   { // Semana 2
     1: [
@@ -303,18 +321,13 @@ const SEED_GYM_WEEKS = [
       ['fondos-maquina', '3', '12 reps'],
       ['triceps-unilateral-polea', '3', '10-12 reps por brazo'],
     ],
-    6: [
-      ['respiracion-90-90', '2', '5 respiraciones lentas'],
-      ['dead-bug', '3', '8 reps por lado, lento'],
-      ['bird-dog', '3', '8 reps por lado'],
-      ['plancha-rkc', '3', '20-30 seg'],
-      ['plancha-lateral', '3', '30 seg por lado'],
-      ['pallof-press', '3', '10 reps por lado'],
-      ['hollow-hold', '3', '20-30 seg'],
-      ['stir-the-pot', '3', '6 círculos por lado'],
-      ['suitcase-carry', '3', '20 pasos por lado'],
-    ],
+    6: SATURDAY_CORE,
   },
+  { 6: SATURDAY_CORE }, // Semana 3 (el resto se carga cuando lleguen las fotos)
+  { 6: SATURDAY_CORE }, // Semana 4 (el resto se carga cuando lleguen las fotos)
+  { 6: SATURDAY_CORE }, // Semana 5 (el resto se carga cuando lleguen las fotos)
+  { 6: SATURDAY_CORE }, // Semana 6 (el resto se carga cuando lleguen las fotos)
+  { 6: SATURDAY_CORE }, // Semana 7 (el resto se carga cuando lleguen las fotos)
 ];
 
 // Reemplazos casa → gym, para actualizar programas ya guardados en el teléfono.
@@ -338,4 +351,11 @@ const SEED_GYM_TOTAL_WEEKS = 7;
 
 // Subir este número cada vez que se cargan semanas nuevas: en los teléfonos que ya
 // tienen la app, se completan solas las semanas que todavía estaban vacías.
-const SEED_VERSION = 4;
+const SEED_VERSION = 5;
+
+// Ejercicios sumados después a días que ya estaban cargados. "since" es la
+// SEED_VERSION en que se agregaron; se suman solo si el día no los tiene.
+const SEED_APPENDS = [
+  { since: 5, week: 0, day: 1, items: [['lenador-polea', '3', '10 reps por lado'], ['slam-medicine-ball', '3', '12 reps']] },
+  { since: 5, week: 0, day: 4, items: [['crunch-polea-alta', '3', '15 reps'], ['giro-medicine-ball', '3', '12 reps por lado']] },
+];
