@@ -8,6 +8,8 @@ const DAY_SHORT = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
 const WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0];
 const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto',
   'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const TYPES = ['casa', 'gym'];
+const TYPE_LABEL = { casa: 'Casa', gym: 'Gym' };
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
@@ -17,18 +19,56 @@ function emptyWeek() {
   return w;
 }
 
-function seedState() {
+function weekFromSeed(seed) {
+  const w = emptyWeek();
+  for (const d in seed) w[d] = seed[d].map(([exId, sets, reps]) => ({ uid: uid(), exId, sets, reps }));
+  return w;
+}
+
+function seedGymProgram() {
+  const weeks = [];
+  for (let i = 0; i < SEED_GYM_TOTAL_WEEKS; i++) {
+    weeks.push(SEED_GYM_WEEKS[i] ? weekFromSeed(SEED_GYM_WEEKS[i]) : emptyWeek());
+  }
+  return { start: SEED_GYM_START, weeks };
+}
+
+function seedExercises() {
   const exercises = {};
   SEED_EXERCISES.forEach(e => { exercises[e.id] = { video: '', ...e }; });
-  const plans = { casa: emptyWeek(), gym: emptyWeek() };
-  plans.casa[2] = SEED_TUESDAY.map(([exId, sets, reps]) => ({ uid: uid(), exId, sets, reps }));
-  return { version: 1, exercises, plans, done: {}, log: {}, type: 'casa' };
+  return exercises;
+}
+
+function seedState() {
+  return {
+    version: 2,
+    exercises: seedExercises(),
+    programs: { casa: { start: SEED_GYM_START, weeks: [emptyWeek()] }, gym: seedGymProgram() },
+    done: {}, log: {}, type: 'gym',
+  };
+}
+
+// v1 tenía una sola semana que se repetía por tipo (state.plans).
+function migrate(s) {
+  if (s.version === 1) {
+    for (const [id, ex] of Object.entries(seedExercises())) if (!s.exercises[id]) s.exercises[id] = ex;
+    s.programs = {
+      casa: { start: SEED_GYM_START, weeks: [s.plans.casa] },
+      gym: seedGymProgram(),
+    };
+    const gymUsed = Object.values(s.plans.gym).some(d => d.length);
+    if (gymUsed) s.programs.gym.weeks[0] = s.plans.gym;
+    delete s.plans;
+    s.type = 'gym';
+    s.version = 2;
+  }
+  return s;
 }
 
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) return migrate(JSON.parse(raw));
   } catch (e) { /* almacenamiento no disponible */ }
   return seedState();
 }
@@ -38,6 +78,74 @@ let state = loadState();
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   catch (e) { toast('No se pudo guardar en este navegador'); }
+}
+
+save(); // deja guardada la versión migrada
+
+// ---------- Videos guardados en el teléfono (IndexedDB) ----------
+
+const videos = { db: null, keys: new Set(), urls: new Map() };
+
+function idb(mode, fn) {
+  return new Promise((resolve, reject) => {
+    if (!videos.db) { reject(new Error('sin base')); return; }
+    const tx = videos.db.transaction('videos', mode);
+    const req = fn(tx.objectStore('videos'));
+    tx.oncomplete = () => resolve(req && req.result);
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+function openVideoDB() {
+  return new Promise(resolve => {
+    try {
+      const req = indexedDB.open('mi-workout-videos', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('videos');
+      req.onsuccess = () => { videos.db = req.result; resolve(); };
+      req.onerror = () => resolve();
+    } catch (e) { resolve(); }
+  });
+}
+
+async function loadVideoKeys() {
+  try { (await idb('readonly', s => s.getAllKeys())).forEach(k => videos.keys.add(k)); }
+  catch (e) { /* sin videos locales */ }
+}
+
+async function saveVideo(exId, file) {
+  await idb('readwrite', s => s.put(file, exId));
+  videos.keys.add(exId);
+  dropVideoURL(exId);
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* opcional */ }
+}
+
+async function deleteVideo(exId) {
+  if (!videos.keys.has(exId)) return;
+  try { await idb('readwrite', s => s.delete(exId)); } catch (e) { /* ya no estaba */ }
+  videos.keys.delete(exId);
+  dropVideoURL(exId);
+}
+
+function dropVideoURL(exId) {
+  if (videos.urls.has(exId)) { URL.revokeObjectURL(videos.urls.get(exId)); videos.urls.delete(exId); }
+}
+
+async function videoURL(exId) {
+  if (!videos.urls.has(exId)) {
+    const blob = await idb('readonly', s => s.get(exId));
+    if (!blob) return null;
+    videos.urls.set(exId, URL.createObjectURL(blob));
+  }
+  return videos.urls.get(exId);
+}
+
+function fillLocalVideos() {
+  document.querySelectorAll('[data-local-video]').forEach(async el => {
+    try {
+      const url = await videoURL(el.dataset.localVideo);
+      if (url) el.innerHTML = `<video src="${url}" controls playsinline preload="metadata"></video>`;
+    } catch (e) { el.remove(); }
+  });
 }
 
 // ---------- Utilidades ----------
@@ -58,6 +166,11 @@ function prettyDate(s) {
   const d = fromISO(s);
   return `${DAY_NAMES[d.getDay()]}, ${d.getDate()} de ${MONTHS[d.getMonth()]}`;
 }
+function mondayOf(s) {
+  const d = fromISO(s);
+  d.setDate(d.getDate() - (d.getDay() + 6) % 7);
+  return d;
+}
 
 function toast(msg) {
   const t = document.createElement('div');
@@ -74,6 +187,7 @@ function youtubeId(url) {
 }
 
 function videoHTML(ex) {
+  if (ex.id && videos.keys.has(ex.id)) return `<div class="video" data-local-video="${esc(ex.id)}"></div>`;
   const id = youtubeId(ex.video);
   if (id) {
     return `<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/${id}" title="${esc(ex.name)}"
@@ -86,6 +200,9 @@ function videoHTML(ex) {
   return `<a class="video-link" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">
     ▶ Buscar video en YouTube</a>`;
 }
+
+// "Cuádriceps (Vasto medial)" y "Cuádriceps (Recto femoral)" cuentan como el mismo grupo.
+const baseMuscle = m => (m || '').split('(')[0].trim();
 
 function muscles() {
   return [...new Set(Object.values(state.exercises).map(e => e.muscle).filter(Boolean))].sort();
@@ -100,33 +217,63 @@ function setsLabel(item) {
   return [sets, item.reps].filter(Boolean).join(' | ');
 }
 
+// ---------- Programa por semanas ----------
+
+function program(type = state.type) { return state.programs[type]; }
+
+// Índice de semana (0 = semana 1) para una fecha. Un programa de una sola semana se repite siempre.
+function weekIndex(iso, type = state.type) {
+  const p = program(type);
+  if (p.weeks.length === 1) return 0;
+  return Math.round((mondayOf(iso) - mondayOf(p.start)) / (7 * 864e5));
+}
+
+function itemsFor(iso, type = state.type) {
+  const idx = weekIndex(iso, type);
+  const p = program(type);
+  if (idx < 0 || idx >= p.weeks.length) return null;
+  return p.weeks[idx][fromISO(iso).getDay()];
+}
+
+function clampWeek(idx) { return Math.max(0, Math.min(program().weeks.length - 1, idx)); }
+
+function allPlans() {
+  const lists = [];
+  for (const type of TYPES) for (const w of state.programs[type].weeks) for (let d = 0; d < 7; d++) lists.push([w, d]);
+  return lists;
+}
+
 // ---------- Navegación ----------
 
-const ui = { tab: 'hoy', date: toISO(new Date()), open: null, weekDay: new Date().getDay(), search: '' };
+const today = toISO(new Date());
+const ui = { tab: 'hoy', date: today, open: null, weekIdx: clampWeek(weekIndex(today)), weekDay: new Date().getDay(), search: '' };
 
 document.querySelectorAll('.tabbar button').forEach(b => {
   b.addEventListener('click', () => {
-    if (b.dataset.tab === 'semana' && ui.tab === 'hoy') ui.weekDay = fromISO(ui.date).getDay();
+    if (b.dataset.tab === 'semana' && ui.tab === 'hoy') syncWeekToDate();
     ui.tab = b.dataset.tab; render();
   });
 });
 
+function syncWeekToDate() {
+  ui.weekIdx = clampWeek(weekIndex(ui.date));
+  ui.weekDay = fromISO(ui.date).getDay();
+}
+
 function render() {
   document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab === ui.tab));
-  const titles = { hoy: 'Workout', semana: 'Mi semana', ejercicios: 'Ejercicios', mas: 'Más' };
+  const titles = { hoy: 'Workout', semana: 'Mi programa', ejercicios: 'Ejercicios', mas: 'Más' };
   $('#title').textContent = titles[ui.tab];
   ({ hoy: renderHoy, semana: renderSemana, ejercicios: renderEjercicios, mas: renderMas })[ui.tab]();
 }
 
 function typeToggle() {
-  return `<div class="segmented" id="type">
-    <button data-type="casa" class="${state.type === 'casa' ? 'on' : ''}">Casa</button>
-    <button data-type="gym" class="${state.type === 'gym' ? 'on' : ''}">Gym</button>
-  </div>`;
+  return `<div class="segmented" id="type">${TYPES.map(t =>
+    `<button data-type="${t}" class="${state.type === t ? 'on' : ''}">${TYPE_LABEL[t]}</button>`).join('')}</div>`;
 }
 function bindTypeToggle() {
   document.querySelectorAll('#type button').forEach(b => b.addEventListener('click', () => {
-    state.type = b.dataset.type; ui.open = null; save(); render();
+    state.type = b.dataset.type; ui.open = null; ui.weekIdx = clampWeek(ui.weekIdx); save(); render();
   }));
 }
 
@@ -135,9 +282,19 @@ function bindTypeToggle() {
 function doneKey() { return `${ui.date}|${state.type}`; }
 function doneSet() { return new Set(state.done[doneKey()] || []); }
 
+function weekBanner() {
+  const p = program();
+  if (p.weeks.length === 1) return '';
+  const idx = weekIndex(ui.date);
+  if (idx < 0) return `<p class="week-banner">El programa empieza el ${prettyDate(p.start).toLowerCase()}</p>`;
+  if (idx >= p.weeks.length) return `<p class="week-banner">Terminaste las ${p.weeks.length} semanas del programa 🎉</p>`;
+  return `<p class="week-banner">Semana ${idx + 1} de ${p.weeks.length}</p>`;
+}
+
 function renderHoy() {
   const weekday = fromISO(ui.date).getDay();
-  const items = state.plans[state.type][weekday];
+  const items = itemsFor(ui.date) || [];
+  const inProgram = itemsFor(ui.date) !== null;
   const done = doneSet();
   const count = items.filter(i => done.has(i.uid)).length;
   const pct = items.length ? Math.round(count / items.length * 100) : 0;
@@ -149,11 +306,12 @@ function renderHoy() {
         <input type="date" id="date" value="${ui.date}">
       </label>
       <button class="date-nav" id="next" aria-label="Día siguiente">›</button>
-    </div>`;
+    </div>` + weekBanner();
 
   if (!items.length) {
-    html += `<div class="empty"><p>No hay ejercicios para los ${DAY_NAMES[weekday].toLowerCase()} (${state.type}).</p>
-      <button class="btn" id="go-week">Armar este día</button></div>`;
+    html += `<div class="empty">` + (inProgram
+      ? `<p>No hay ejercicios para este ${DAY_NAMES[weekday].toLowerCase()}.</p><button class="btn" id="go-week">Armar este día</button>`
+      : `<p>Fuera del programa.</p><button class="btn secondary" id="go-today">Ir a hoy</button>`) + `</div>`;
   } else {
     html += `<div class="progress-label">${count}/${items.length} completados</div>
       <div class="progress"><div style="width:${pct}%"></div></div><div class="list">`;
@@ -167,14 +325,15 @@ function renderHoy() {
         <button class="item-head" data-open="${item.uid}">
           <span class="num">${isDone ? '✓' : i + 1}</span>
           <span><div class="item-title">${esc(ex.name)}</div>
-          <div class="item-sub">${esc(ex.muscle)}${ex.muscle ? ' · ' : ''}${esc(setsLabel(item))}</div></span>
+          <div class="item-sub">${esc(ex.muscle)}${ex.muscle && setsLabel(item) ? ' · ' : ''}${esc(setsLabel(item))}</div></span>
           <span class="chev">⌄</span>
         </button>
         ${isOpen ? `<div class="item-body">
           ${videoHTML(ex)}
           <div class="tag">${esc(ex.muscle)}${ex.equipment ? ` · ${esc(ex.equipment)}` : ''}</div>
-          <div class="box center">${esc(setsLabel(item))}</div>
-          ${ex.description ? `<div class="box desc">${esc(ex.description)}</div>` : ''}
+          ${setsLabel(item) ? `<div class="box center">${esc(setsLabel(item))}</div>` : ''}
+          ${ex.description ? `<div class="box desc">${esc(ex.description)}</div>`
+            : `<div class="box desc muted">Sin explicación todavía. Tocá ✎ Editar para agregarla o cargar tu video.</div>`}
           <div class="weight">
             <span class="muted">Peso (kg)</span>
             <input type="number" inputmode="decimal" step="0.5" min="0" data-weight="${item.exId}" value="${todayW ?? ''}" placeholder="—">
@@ -198,12 +357,15 @@ function renderHoy() {
 
   $('#view').innerHTML = html;
   bindTypeToggle();
+  fillLocalVideos();
 
   $('#date').addEventListener('change', e => { if (e.target.value) { ui.date = e.target.value; ui.open = null; render(); } });
   $('#prev').onclick = () => shiftDate(-1);
   $('#next').onclick = () => shiftDate(1);
   const goWeek = $('#go-week');
-  if (goWeek) goWeek.onclick = () => { ui.weekDay = weekday; ui.tab = 'semana'; render(); };
+  if (goWeek) goWeek.onclick = () => { syncWeekToDate(); ui.tab = 'semana'; render(); };
+  const goToday = $('#go-today');
+  if (goToday) goToday.onclick = () => { ui.date = today; render(); };
 
   document.querySelectorAll('[data-open]').forEach(b => b.onclick = () => {
     ui.open = ui.open === b.dataset.open ? null : b.dataset.open; render();
@@ -216,7 +378,7 @@ function renderHoy() {
   document.querySelectorAll('[data-swap]').forEach(b => b.onclick = () => {
     const item = items.find(i => i.uid === b.dataset.swap);
     openPicker({ title: 'Cambiar por…', current: item.exId, muscle: exerciseOf(item).muscle,
-      onPick: exId => { item.exId = exId; save(); render(); toast('Cambiado en tu rutina'); } });
+      onPick: exId => { item.exId = exId; save(); render(); toast('Cambiado en tu programa'); } });
   });
   document.querySelectorAll('[data-edit-ex]').forEach(b => b.onclick = () => openExerciseForm(b.dataset.editEx));
   document.querySelectorAll('[data-weight]').forEach(inp => inp.onchange = () => setWeight(inp.dataset.weight, ui.date, inp.value));
@@ -261,17 +423,26 @@ function lastWeight(exId, beforeDate) {
   return list[list.length - 1] || null;
 }
 
-// ---------- Semana ----------
+// ---------- Semana / programa ----------
 
 function renderSemana() {
-  const plan = state.plans[state.type];
-  const items = plan[ui.weekDay];
+  const p = program();
+  ui.weekIdx = clampWeek(ui.weekIdx);
+  const week = p.weeks[ui.weekIdx];
+  const items = week[ui.weekDay];
+  const multi = p.weeks.length > 1;
 
-  let html = typeToggle() + `<div class="days">` + WEEK_ORDER.map(d =>
-    `<button data-day="${d}" class="${d === ui.weekDay ? 'on' : ''}">${DAY_SHORT[d]}${plan[d].length ? '<span class="dot"></span>' : ''}</button>`
+  let html = typeToggle();
+  if (multi || state.type === 'gym') {
+    html += `<div class="weeks">` + p.weeks.map((w, i) =>
+      `<button data-week="${i}" class="${i === ui.weekIdx ? 'on' : ''}">S${i + 1}${Object.values(w).some(d => d.length) ? '' : ' ·'}</button>`
+    ).join('') + `<button id="add-week" aria-label="Agregar semana">+</button></div>`;
+  }
+  html += `<div class="days">` + WEEK_ORDER.map(d =>
+    `<button data-day="${d}" class="${d === ui.weekDay ? 'on' : ''}">${DAY_SHORT[d]}${week[d].length ? '<span class="dot"></span>' : ''}</button>`
   ).join('') + `</div>
     <div class="row between" style="margin-bottom:8px">
-      <strong>${DAY_NAMES[ui.weekDay]} · ${state.type === 'casa' ? 'Casa' : 'Gym'}</strong>
+      <strong>${multi ? `Semana ${ui.weekIdx + 1} · ` : ''}${DAY_NAMES[ui.weekDay]} · ${TYPE_LABEL[state.type]}</strong>
       ${items.length ? `<button class="btn ghost small" id="copy-day">Copiar a…</button>` : ''}
     </div>`;
 
@@ -283,7 +454,7 @@ function renderSemana() {
       return `<div class="item"><div class="edit-item">
         <span class="num">${i + 1}</span>
         <div class="grow"><div class="item-title">${esc(ex.name)}</div>
-          <div class="item-sub">${esc(ex.muscle)} · ${esc(setsLabel(item))}</div></div>
+          <div class="item-sub">${esc(ex.muscle)}${setsLabel(item) ? ' · ' + esc(setsLabel(item)) : ''}</div></div>
         <div class="edit-actions">
           <button class="icon-btn" data-up="${i}" ${i === 0 ? 'disabled' : ''} aria-label="Subir">↑</button>
           <button class="icon-btn" data-down="${i}" ${i === items.length - 1 ? 'disabled' : ''} aria-label="Bajar">↓</button>
@@ -293,10 +464,12 @@ function renderSemana() {
     }).join('') + `</div>`;
   }
   html += `<button class="btn block" id="add-item" style="margin-top:12px">+ Agregar ejercicio</button>`;
+  if (multi) html += `<button class="btn ghost block" id="del-week" style="margin-top:8px">Quitar semana ${ui.weekIdx + 1}</button>`;
 
   $('#view').innerHTML = html;
   bindTypeToggle();
 
+  document.querySelectorAll('[data-week]').forEach(b => b.onclick = () => { ui.weekIdx = Number(b.dataset.week); render(); });
   document.querySelectorAll('[data-day]').forEach(b => b.onclick = () => { ui.weekDay = Number(b.dataset.day); render(); });
   document.querySelectorAll('[data-up]').forEach(b => b.onclick = () => move(items, Number(b.dataset.up), -1));
   document.querySelectorAll('[data-down]').forEach(b => b.onclick = () => move(items, Number(b.dataset.down), 1));
@@ -305,6 +478,15 @@ function renderSemana() {
     items.push({ uid: uid(), exId, sets: '3', reps: '12 reps' }); save(); render();
     openItemForm(items, items.length - 1);
   } });
+  const addWeek = $('#add-week');
+  if (addWeek) addWeek.onclick = () => {
+    p.weeks.push(emptyWeek()); ui.weekIdx = p.weeks.length - 1; save(); render(); toast(`Semana ${p.weeks.length} agregada`);
+  };
+  const delWeek = $('#del-week');
+  if (delWeek) delWeek.onclick = () => {
+    if (!confirm(`¿Quitar la semana ${ui.weekIdx + 1} con todos sus ejercicios?`)) return;
+    p.weeks.splice(ui.weekIdx, 1); ui.weekIdx = clampWeek(ui.weekIdx); save(); render();
+  };
   const copy = $('#copy-day');
   if (copy) copy.onclick = () => openCopyDay(items);
 }
@@ -337,31 +519,38 @@ function openItemForm(items, i) {
 }
 
 function openCopyDay(items) {
-  const targets = WEEK_ORDER.filter(d => d !== ui.weekDay);
+  const p = program();
+  const days = WEEK_ORDER.filter(d => d !== ui.weekDay);
+  const weeks = p.weeks.map((_, i) => i).filter(i => i !== ui.weekIdx);
   openSheet(`
     <div class="sheet-head"><h2>Copiar ${DAY_NAMES[ui.weekDay]} a…</h2><button class="icon-btn" data-close>✕</button></div>
     <p class="muted">Reemplaza lo que haya en el día elegido.</p>
-    <div class="pick">${targets.map(d => `<button data-to="${d}">${DAY_NAMES[d]}</button>`).join('')}</div>`);
+    <div class="group-title">Otro día de esta semana</div>
+    <div class="pick">${days.map(d => `<button data-to="${ui.weekIdx}:${d}">${DAY_NAMES[d]}</button>`).join('')}</div>
+    ${weeks.length ? `<div class="group-title">${DAY_NAMES[ui.weekDay]} de otra semana</div>
+    <div class="pick">${weeks.map(w => `<button data-to="${w}:${ui.weekDay}">Semana ${w + 1}</button>`).join('')}</div>` : ''}`);
   document.querySelectorAll('[data-to]').forEach(b => b.onclick = () => {
-    const d = Number(b.dataset.to);
-    state.plans[state.type][d] = items.map(it => ({ ...it, uid: uid() }));
-    save(); closeSheet(); render(); toast(`Copiado a ${DAY_NAMES[d]}`);
+    const [w, d] = b.dataset.to.split(':').map(Number);
+    p.weeks[w][d] = items.map(it => ({ ...it, uid: uid() }));
+    save(); closeSheet(); render();
+    toast(w === ui.weekIdx ? `Copiado a ${DAY_NAMES[d]}` : `Copiado a la semana ${w + 1}`);
   });
 }
 
 // ---------- Selector de ejercicios ----------
 
 function openPicker({ title, current, muscle, onPick }) {
+  const base = baseMuscle(muscle);
   const draw = (q = '') => {
     const all = Object.values(state.exercises)
       .filter(e => !q || `${e.name} ${e.muscle} ${e.equipment}`.toLowerCase().includes(q.toLowerCase()))
       .sort((a, b) => a.name.localeCompare(b.name));
-    const same = muscle ? all.filter(e => e.muscle === muscle && e.id !== current) : [];
+    const same = base ? all.filter(e => baseMuscle(e.muscle) === base && e.id !== current) : [];
     const rest = all.filter(e => !same.includes(e) && e.id !== current);
     const btn = e => `<button data-pick="${e.id}"><div class="item-title">${esc(e.name)}</div>
       <div class="item-sub">${esc(e.muscle)}${e.equipment ? ' · ' + esc(e.equipment) : ''}</div></button>`;
     $('#pick-list').innerHTML =
-      (same.length ? `<div class="group-title">Mismo músculo (${esc(muscle)})</div><div class="pick">${same.map(btn).join('')}</div>` : '') +
+      (same.length ? `<div class="group-title">Mismo músculo (${esc(base)})</div><div class="pick">${same.map(btn).join('')}</div>` : '') +
       (rest.length ? `<div class="group-title">${same.length ? 'Otros' : 'Todos'}</div><div class="pick">${rest.map(btn).join('')}</div>` : '') +
       (!same.length && !rest.length ? `<p class="muted">Sin resultados.</p>` : '');
     document.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => { closeSheet(); onPick(b.dataset.pick); });
@@ -383,21 +572,22 @@ function renderEjercicios() {
   const list = Object.values(state.exercises)
     .filter(e => !q || `${e.name} ${e.muscle} ${e.equipment}`.toLowerCase().includes(q));
   const groups = {};
-  list.forEach(e => (groups[e.muscle || 'Sin grupo'] ||= []).push(e));
+  list.forEach(e => (groups[baseMuscle(e.muscle) || 'Sin grupo'] ||= []).push(e));
 
   let html = `<input type="search" id="lib-q" class="search" placeholder="Buscar ejercicio o músculo…" value="${esc(ui.search)}">
     <button class="btn block" id="lib-new">+ Nuevo ejercicio</button>`;
   Object.keys(groups).sort().forEach(m => {
     html += `<div class="group-title">${esc(m)}</div><div class="pick">` +
-      groups[m].sort((a, b) => a.name.localeCompare(b.name)).map(e =>
-        `<button data-ex="${e.id}"><div class="item-title">${esc(e.name)}</div>
-         <div class="item-sub">${esc(e.equipment || '')}${e.video ? ' · 🎬 video' : ''}</div></button>`).join('') + `</div>`;
+      groups[m].sort((a, b) => a.name.localeCompare(b.name)).map(e => {
+        const hasVideo = videos.keys.has(e.id) ? ' · 🎬 tu video' : e.video ? ' · 🎬 link' : '';
+        return `<button data-ex="${e.id}"><div class="item-title">${esc(e.name)}</div>
+         <div class="item-sub">${esc(e.equipment || '')}${hasVideo}</div></button>`;
+      }).join('') + `</div>`;
   });
   if (!list.length) html += `<p class="empty">Sin resultados.</p>`;
   $('#view').innerHTML = html;
 
-  const qi = $('#lib-q');
-  qi.oninput = e => {
+  $('#lib-q').oninput = e => {
     ui.search = e.target.value; renderEjercicios();
     const el = $('#lib-q'); el.focus(); el.setSelectionRange(el.value.length, el.value.length);
   };
@@ -406,29 +596,45 @@ function renderEjercicios() {
 }
 
 function usageCount(exId) {
-  let n = 0;
-  for (const type of ['casa', 'gym']) for (let d = 0; d < 7; d++) n += state.plans[type][d].filter(i => i.exId === exId).length;
-  return n;
+  return allPlans().reduce((n, [w, d]) => n + w[d].filter(i => i.exId === exId).length, 0);
 }
 
 function openExerciseForm(exId, { muscle = '', onCreated } = {}) {
   const ex = exId ? state.exercises[exId] : { name: '', muscle, equipment: '', description: '', video: '' };
   const used = exId ? usageCount(exId) : 0;
+  const hasLocal = exId && videos.keys.has(exId);
   openSheet(`
     <div class="sheet-head"><h2>${exId ? 'Editar ejercicio' : 'Nuevo ejercicio'}</h2><button class="icon-btn" data-close>✕</button></div>
     <label>Nombre</label><input type="text" id="e-name" value="${esc(ex.name)}">
     <label>Músculo principal</label><input type="text" id="e-muscle" list="muscle-list" value="${esc(ex.muscle)}">
     <datalist id="muscle-list">${muscles().map(m => `<option value="${esc(m)}">`).join('')}</datalist>
-    <label>Equipo</label><input type="text" id="e-equip" value="${esc(ex.equipment)}" placeholder="Mancuernas, banda, peso corporal…">
-    <label>Link de video (YouTube u otro)</label><input type="url" id="e-video" value="${esc(ex.video)}" placeholder="https://youtube.com/…">
+    <label>Equipo</label><input type="text" id="e-equip" value="${esc(ex.equipment)}" placeholder="Mancuernas, banda, polea…">
+    ${videos.db ? `<label>Video desde tu celular</label>
+    <div class="row">
+      <label class="btn secondary small" style="margin:0;color:var(--pink)">${hasLocal ? 'Reemplazar video' : 'Elegir video'}
+        <input type="file" id="e-file" accept="video/*" hidden></label>
+      <span class="muted" id="e-file-name">${hasLocal ? '🎬 Ya tiene tu video' : ''}</span>
+      ${hasLocal ? `<button class="btn ghost small" id="e-file-del">Quitar</button>` : ''}
+    </div>` : ''}
+    <label>O link de video (YouTube u otro)</label><input type="url" id="e-video" value="${esc(ex.video)}" placeholder="https://youtube.com/…">
     <label>Cómo se hace</label><textarea id="e-desc">${esc(ex.description)}</textarea>
     <div class="actions">
       ${exId ? `<button class="btn danger" id="e-del">Borrar</button>` : ''}
       <button class="btn" id="e-save">Guardar</button>
     </div>
-    ${used ? `<p class="muted">Usado ${used} ${used === 1 ? 'vez' : 'veces'} en tus rutinas.</p>` : ''}`);
+    ${used ? `<p class="muted">Usado ${used} ${used === 1 ? 'vez' : 'veces'} en tus programas.</p>` : ''}`);
 
-  $('#e-save').onclick = () => {
+  let pickedFile = null;
+  let removeLocal = false;
+  const fileInput = $('#e-file');
+  if (fileInput) fileInput.onchange = () => {
+    pickedFile = fileInput.files[0] || null;
+    if (pickedFile) $('#e-file-name').textContent = `🎬 ${pickedFile.name} (${Math.round(pickedFile.size / 1048576)} MB)`;
+  };
+  const fileDel = $('#e-file-del');
+  if (fileDel) fileDel.onclick = () => { removeLocal = true; pickedFile = null; $('#e-file-name').textContent = 'Se quitará al guardar'; fileDel.remove(); };
+
+  $('#e-save').onclick = async () => {
     const name = $('#e-name').value.trim();
     if (!name) { toast('Poné un nombre'); return; }
     const data = { name, muscle: $('#e-muscle').value.trim(), equipment: $('#e-equip').value.trim(),
@@ -436,28 +642,43 @@ function openExerciseForm(exId, { muscle = '', onCreated } = {}) {
     let id = exId;
     if (id) Object.assign(state.exercises[id], data);
     else { id = uid(); state.exercises[id] = { id, ...data }; }
-    save(); closeSheet();
+    save();
+    try {
+      if (pickedFile) { $('#e-save').textContent = 'Guardando video…'; await saveVideo(id, pickedFile); }
+      else if (removeLocal) await deleteVideo(id);
+    } catch (e) { toast('No se pudo guardar el video (¿falta espacio?)'); }
+    closeSheet();
     if (!exId && onCreated) onCreated(id); else render();
   };
   const del = $('#e-del');
-  if (del) del.onclick = () => {
-    const msg = used ? `Está en ${used} lugar(es) de tus rutinas y se quitará de ahí. ¿Borrar?` : '¿Borrar este ejercicio?';
+  if (del) del.onclick = async () => {
+    const msg = used ? `Está en ${used} lugar(es) de tus programas y se quitará de ahí. ¿Borrar?` : '¿Borrar este ejercicio?';
     if (!confirm(msg)) return;
     delete state.exercises[exId];
-    for (const type of ['casa', 'gym']) for (let d = 0; d < 7; d++)
-      state.plans[type][d] = state.plans[type][d].filter(i => i.exId !== exId);
-    save(); closeSheet(); render();
+    for (const [w, d] of allPlans()) w[d] = w[d].filter(i => i.exId !== exId);
+    save(); await deleteVideo(exId); closeSheet(); render();
   };
 }
 
-// ---------- Más: respaldo ----------
+// ---------- Más: programa y respaldo ----------
 
 function renderMas() {
-  $('#view').innerHTML = `
+  const p = program();
+  const idx = weekIndex(today);
+  const current = p.weeks.length === 1 ? 'Se repite todas las semanas'
+    : idx < 0 ? 'Todavía no empezó' : idx >= p.weeks.length ? 'Terminado' : `Esta semana es la ${idx + 1} de ${p.weeks.length}`;
+  $('#view').innerHTML = typeToggle() + `
     <div class="box desc">
+      <strong>Programa ${TYPE_LABEL[state.type]}</strong>
+      <p class="muted">${p.weeks.length} ${p.weeks.length === 1 ? 'semana' : 'semanas'} · ${current}</p>
+      <label>La semana 1 empieza el</label>
+      <input type="date" id="start" value="${p.start}">
+    </div>
+    <div class="box desc" style="margin-top:12px">
       <strong>Respaldo</strong>
       <p class="muted">Tus datos viven solo en este teléfono. Si borrás los datos del navegador se pierden:
-      exportá un respaldo de vez en cuando (por ejemplo, guardalo en Drive o mandalo por mail).</p>
+      exportá un respaldo de vez en cuando (por ejemplo, guardalo en Drive o mandalo por mail).
+      Los videos que cargaste no entran en el respaldo; guardá los originales en tu galería.</p>
       <div class="row"><button class="btn" id="export">Exportar</button>
       <label class="btn secondary" style="margin:0;color:var(--pink)">Importar<input type="file" id="import" accept="application/json" hidden></label></div>
     </div>
@@ -468,15 +689,20 @@ function renderMas() {
     </div>
     <div class="box desc" style="margin-top:12px">
       <strong>Empezar de cero</strong>
-      <p class="muted">Vuelve a los ejercicios y la rutina de ejemplo. Borra tus cambios.</p>
+      <p class="muted">Vuelve a los ejercicios y el programa original. Borra tus cambios (no los videos).</p>
       <button class="btn danger small" id="reset">Restablecer</button>
     </div>`;
+  bindTypeToggle();
 
+  $('#start').onchange = e => {
+    if (!e.target.value) return;
+    p.start = e.target.value; save(); render(); toast('Fecha de inicio actualizada');
+  };
   $('#export').onclick = () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `mi-workout-${toISO(new Date())}.json`;
+    a.download = `mi-workout-${today}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
@@ -484,8 +710,8 @@ function renderMas() {
     const file = e.target.files[0];
     if (!file) return;
     try {
-      const data = JSON.parse(await file.text());
-      if (!data.exercises || !data.plans) throw new Error('formato');
+      const data = migrate(JSON.parse(await file.text()));
+      if (!data.exercises || !data.programs) throw new Error('formato');
       if (!confirm('Esto reemplaza todos tus datos actuales. ¿Seguir?')) return;
       state = data; save(); toast('Respaldo importado'); render();
     } catch (err) { toast('El archivo no es un respaldo válido'); }
@@ -510,6 +736,7 @@ $('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeS
 // ---------- Inicio ----------
 
 render();
+openVideoDB().then(loadVideoKeys).then(render);
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }

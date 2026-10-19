@@ -1,5 +1,5 @@
 // Cache para que la app funcione sin internet. Cambiá la versión al modificar archivos.
-const CACHE = 'mi-workout-v1';
+const CACHE = 'mi-workout-v2';
 const FILES = ['./', 'index.html', 'styles.css', 'app.js', 'data.js', 'manifest.webmanifest',
   'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
