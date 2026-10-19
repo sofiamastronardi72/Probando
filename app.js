@@ -42,6 +42,7 @@ function seedExercises() {
 function seedState() {
   return {
     version: 3,
+    seedVersion: SEED_VERSION,
     exercises: seedExercises(),
     programs: { casa: { start: SEED_GYM_START, weeks: [emptyWeek()] }, gym: seedGymProgram() },
     done: {}, log: {}, type: 'gym',
@@ -69,6 +70,15 @@ function migrate(s) {
       if (up) { item.exId = up[0]; if (up[1]) item.reps = up[1]; }
     }
     s.version = 3;
+  }
+  if ((s.seedVersion || 0) < SEED_VERSION) {
+    for (const [id, ex] of Object.entries(seedExercises())) if (!s.exercises[id]) s.exercises[id] = ex;
+    const weeks = s.programs.gym.weeks;
+    SEED_GYM_WEEKS.forEach((seed, i) => {
+      const isEmpty = w => !w || Object.values(w).every(d => !d.length);
+      if (i < weeks.length && isEmpty(weeks[i])) weeks[i] = weekFromSeed(seed);
+    });
+    s.seedVersion = SEED_VERSION;
   }
   return s;
 }
