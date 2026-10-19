@@ -147,6 +147,35 @@ async function videoURL(exId) {
   return videos.urls.get(exId);
 }
 
+// Respaldo de videos: se exportan como archivos sueltos con el nombre del ejercicio
+// y el id al final ("peso-muerto-rumano__peso-muerto-rumano-barra.mov"), así al
+// recuperarlos se asignan solos aunque el nombre del ejercicio haya cambiado.
+const VIDEO_BATCH = 10;
+const VIDEO_EXT = { 'video/quicktime': 'mov', 'video/mp4': 'mp4', 'video/webm': 'webm', 'video/x-m4v': 'm4v' };
+
+function slugify(text) {
+  return String(text).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'ejercicio';
+}
+
+async function videoBackupFiles() {
+  const files = [];
+  for (const exId of videos.keys) {
+    const blob = await idb('readonly', s => s.get(exId));
+    if (!blob) continue;
+    const fromName = blob.name && blob.name.includes('.') ? blob.name.split('.').pop().toLowerCase() : '';
+    const ext = VIDEO_EXT[blob.type] || fromName || 'mp4';
+    const name = `${slugify(state.exercises[exId]?.name || exId)}__${exId}.${ext}`;
+    files.push(new File([blob], name, { type: blob.type || 'video/mp4' }));
+  }
+  return files.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function exIdFromBackupName(name) {
+  const m = name.match(/__([^_.][^.]*)\.[a-z0-9]+$/i);
+  return m && state.exercises[m[1]] ? m[1] : null;
+}
+
 function fillLocalVideos() {
   document.querySelectorAll('[data-local-video]').forEach(async el => {
     try {
@@ -686,9 +715,17 @@ function renderMas() {
       <strong>Respaldo</strong>
       <p class="muted">Tus datos viven solo en este teléfono. Si borrás los datos del navegador se pierden:
       exportá un respaldo de vez en cuando (por ejemplo, guardalo en Drive o mandalo por mail).
-      Los videos que cargaste no entran en el respaldo; guardá los originales en tu galería.</p>
+      Los videos van aparte, en la sección de abajo.</p>
       <div class="row"><button class="btn" id="export">Exportar</button>
       <label class="btn secondary" style="margin:0;color:var(--pink)">Importar<input type="file" id="import" accept="application/json" hidden></label></div>
+    </div>
+    <div class="box desc" style="margin-top:12px" id="vbox">
+      <strong>Respaldo de videos</strong>
+      <p class="muted" id="vinfo">Buscando videos…</p>
+      <div class="row" id="vexport" style="flex-wrap:wrap"></div>
+      <p class="muted" style="margin-top:12px">Para recuperarlos (por ejemplo en un teléfono nuevo): primero importá el respaldo de datos de arriba,
+      después tocá “Recuperar videos” y elegí los archivos desde la carpeta donde los guardaste.</p>
+      <label class="btn secondary" style="margin:0;color:var(--pink)">Recuperar videos<input type="file" id="vimport" accept="video/*" multiple hidden></label>
     </div>
     <div class="box desc" style="margin-top:12px">
       <strong>Instalar en el celular</strong>
@@ -702,6 +739,22 @@ function renderMas() {
     </div>`;
   bindTypeToggle();
 
+  setupVideoBackup();
+  $('#vimport').onchange = async e => {
+    const picked = [...e.target.files];
+    if (!picked.length) return;
+    let ok = 0;
+    const unknown = [];
+    for (const file of picked) {
+      const exId = exIdFromBackupName(file.name);
+      if (!exId) { unknown.push(file.name); continue; }
+      try { await saveVideo(exId, file); ok++; } catch (err) { unknown.push(file.name); }
+    }
+    toast(`${ok} ${ok === 1 ? 'video recuperado' : 'videos recuperados'}`);
+    if (unknown.length) alert(`No se pudieron asignar ${unknown.length} archivo(s), porque no tienen el nombre del respaldo ` +
+      `o su ejercicio ya no existe. Asignalos a mano desde ✎ Editar:\n\n${unknown.join('\n')}`);
+    render();
+  };
   $('#start').onchange = e => {
     if (!e.target.value) return;
     p.start = e.target.value; save(); render(); toast('Fecha de inicio actualizada');
@@ -728,6 +781,40 @@ function renderMas() {
     if (!confirm('¿Seguro? Se borran todos tus cambios.')) return;
     state = seedState(); save(); render();
   };
+}
+
+async function setupVideoBackup() {
+  const info = $('#vinfo');
+  const box = $('#vexport');
+  if (!info) return;
+  if (!videos.db || !videos.keys.size) { info.textContent = 'Todavía no cargaste videos.'; return; }
+  let files;
+  try { files = await videoBackupFiles(); } catch (e) { info.textContent = 'No se pudieron leer los videos.'; return; }
+  if (!$('#vinfo')) return; // cambió de pestaña mientras tanto
+  const mb = Math.round(files.reduce((n, f) => n + f.size, 0) / 1048576);
+  info.textContent = `Tenés ${files.length} ${files.length === 1 ? 'video' : 'videos'} (${mb} MB). ` +
+    `Tocá “Guardar” → “Guardar en Archivos” y elegí una carpeta de iCloud Drive (por ejemplo “Mi Workout”).` +
+    (files.length > VIDEO_BATCH ? ` Van de a ${VIDEO_BATCH} para que el teléfono no se trabe.` : '');
+  const batches = [];
+  for (let i = 0; i < files.length; i += VIDEO_BATCH) batches.push(files.slice(i, i + VIDEO_BATCH));
+  box.innerHTML = batches.map((b, i) => `<button class="btn" data-vbatch="${i}">` +
+    (batches.length === 1 ? 'Guardar videos' : `Guardar ${i * VIDEO_BATCH + 1}–${i * VIDEO_BATCH + b.length}`) + `</button>`).join('');
+  box.querySelectorAll('[data-vbatch]').forEach(btn => btn.onclick = async () => {
+    const batch = batches[Number(btn.dataset.vbatch)];
+    if (navigator.canShare && navigator.canShare({ files: batch })) {
+      try { await navigator.share({ files: batch }); btn.textContent += ' ✓'; }
+      catch (e) { if (e.name !== 'AbortError') toast('No se pudo abrir Compartir. Probá de nuevo.'); }
+    } else {
+      for (const f of batch) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(f);
+        a.download = f.name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      }
+      btn.textContent += ' ✓';
+    }
+  });
 }
 
 // ---------- Hoja modal ----------
