@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#d81b72">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Mi Workout">
+  <title>Mi Workout</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar"><h1 id="title">Workout</h1></header>
+
+  <main id="view"></main>
+
+  <nav class="tabbar">
+    <button data-tab="hoy" class="active"><span>🏋️</span>Hoy</button>
+    <button data-tab="semana"><span>📅</span>Semana</button>
+    <button data-tab="ejercicios"><span>📚</span>Ejercicios</button>
+    <button data-tab="mas"><span>⚙️</span>Más</button>
+  </nav>
+
+  <dialog id="sheet"><div id="sheet-body"></div></dialog>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
