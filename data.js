@@ -262,6 +262,11 @@ const SEED_EXERCISES = [
   { id: 'press-twist-mancuernas', name: 'Press con twist con mancuernas', muscle: 'Pecho (Pectoral mayor)', equipment: 'Mancuernas',
     description: 'Acostada en el piso, mancuernas a la altura del pecho y abdomen firme. Empujá hacia arriba girando apenas las muñecas hacia adentro al final, y bajá controlado hasta que los codos toquen el piso.' },
 
+  { id: 'elevaciones-en-abs', name: 'Elevaciones frontales y laterales con mancuernas en abs', muscle: 'Abdominales (Recto abdominal)', equipment: 'Mancuernas livianas',
+    description: 'Sentada en V con el torso inclinado hacia atrás y los pies apoyados o elevados, sosteniendo la posición con el abdomen. Abrí los brazos hacia los costados y después llevalos al frente, sin perder la postura.' },
+  { id: 'plank-rodilla-codo', name: 'Plank con rodilla a codo lento', muscle: 'Oblicuos externos', equipment: 'Peso corporal',
+    description: 'En plancha alta con las manos bajo los hombros. Llevá despacio una rodilla hacia el codo del mismo lado, sin subir ni girar la cadera, y volvé. Alterná. Cuanto más lento, más trabaja el oblicuo.' },
+
   // ---- Estiramientos ----
   { id: 'stretch-couch-9090', name: 'Estiramiento: couch stretch + 90/90 de cadera', muscle: 'Flexores de cadera', equipment: 'Banco o pared + piso',
     description: '1) Couch stretch: rodilla de atrás apoyada en el piso con el empeine contra la pared o un banco, pie de adelante apoyado al frente. Apretá el glúteo de la pierna de atrás y llevá la cadera hacia adelante sin arquear la espalda. Estira cuádriceps y flexor de cadera, que se acortan con las sentadillas y con estar sentada. 45 seg por lado.\n2) 90/90: sentada en el piso con las dos piernas dobladas a 90° (una adelante y otra al costado). Girá las rodillas de un lado al otro, despacio y sin usar las manos si podés. 5 transiciones.' },
@@ -556,6 +561,8 @@ const SEED_GYM_WEEKS = [
       ['press-pecho-maquina', '3', '8-10 reps'],
       ['press-acostada-toque', '3', '15 reps'],
       ['oblicuos-dos-piernas', '3', '10 reps por lado'],
+      ['elevaciones-en-abs', '3', '12 a 14 reps'],
+      ['plank-rodilla-codo', '3', '12 reps por lado'],
     ],
     4: [
       ['sentadilla-smith-talones', '3', '12 reps (3 seg al bajar)'],
@@ -606,7 +613,7 @@ const SEED_GYM_TOTAL_WEEKS = 7;
 
 // Subir este número cada vez que se cargan semanas nuevas: en los teléfonos que ya
 // tienen la app, se completan solas las semanas que todavía estaban vacías.
-const SEED_VERSION = 11;
+const SEED_VERSION = 12;
 
 // Ejercicios sumados después a días que ya estaban cargados. "since" es la
 // SEED_VERSION en que se agregaron; se suman solo si el día no los tiene.
@@ -634,4 +641,5 @@ const SEED_REPLACES = [
 const SEED_APPENDS = [
   { since: 5, week: 0, day: 1, items: [['lenador-polea', '3', '10 reps por lado'], ['slam-medicine-ball', '3', '12 reps']] },
   { since: 5, week: 0, day: 4, items: [['crunch-polea-alta', '3', '15 reps'], ['giro-medicine-ball', '3', '12 reps por lado']] },
+  { since: 12, week: 5, day: 3, items: [['elevaciones-en-abs', '3', '12 a 14 reps'], ['plank-rodilla-codo', '3', '12 reps por lado']] },
 ];
