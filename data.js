@@ -236,6 +236,9 @@ const SEED_EXERCISES = [
   { id: 'pec-deck', name: 'Aperturas en pec deck', muscle: 'Pecho (Pectoral mayor)', equipment: 'Máquina pec deck',
     description: 'Sentada con la espalda apoyada y los brazos abiertos a la altura del pecho. Juntá las manos adelante apretando el pecho, con los codos apenas flexionados, y abrí lento.' },
 
+  { id: 'bulgara-landmine', name: 'Sentadilla búlgara con landmine', muscle: 'Glúteo mayor', equipment: 'Barra en landmine + banco',
+    description: 'Una punta de la barra fija en el landmine (o en un rincón) y la otra punta sostenida con las dos manos contra el pecho. Empeine de atrás en el banco. Bajá inclinando apenas el torso hacia la barra y empujá con el talón de adelante. Al cargar adelante, se trabaja más el glúteo y es más fácil mantener el equilibrio.' },
+
   // ---- Estiramientos ----
   { id: 'stretch-couch-9090', name: 'Estiramiento: couch stretch + 90/90 de cadera', muscle: 'Flexores de cadera', equipment: 'Banco o pared + piso',
     description: '1) Couch stretch: rodilla de atrás apoyada en el piso con el empeine contra la pared o un banco, pie de adelante apoyado al frente. Apretá el glúteo de la pierna de atrás y llevá la cadera hacia adelante sin arquear la espalda. Estira cuádriceps y flexor de cadera, que se acortan con las sentadillas y con estar sentada. 45 seg por lado.\n2) 90/90: sentada en el piso con las dos piernas dobladas a 90° (una adelante y otra al costado). Girá las rodillas de un lado al otro, despacio y sin usar las manos si podés. 5 transiciones.' },
@@ -350,7 +353,7 @@ const SEED_GYM_WEEKS = [
     2: [
       ['zancada-lateral-kettlebell', '3', '12 reps por lado'],
       ['lunge-snatch-unilateral', '3', '12 reps por lado'],
-      ['leg-extension-maquina', '3', '12-10-8 reps'],
+      ['leg-extension-v', '3', '12-10-8 reps'],
       ['step-up-polea', '3', '12 reps por lado'],
       ['abductores-maquina', '3', '15 reps'],
       ['abductor-unilateral', '3', '12 reps por pierna'],
@@ -370,12 +373,12 @@ const SEED_GYM_WEEKS = [
     4: [
       ['leg-extension-maquina', '4', '12 reps'],
       ['leg-press-separadas', '4', '12 reps (pies apenas fuera de la plataforma)'],
-      ['step-up-polea', '3', '12 reps por lado'],
+      ['up-lateral-polea', '3', '12 reps por lado'],
       ['good-morning-smith', '4', '12 reps'],
       ['sentadilla-smith', '4', '12 reps'],
       ['abductor-polea-banda', '3', '12 reps por lado'],
       ['crunch-polea-alta', '3', '15 reps'],
-      ['pallof-press', '3', '10 reps por lado'],
+      ['lenador-polea', '3', '10 reps por lado'],
     ],
     5: [
       ['elevaciones-mini-salto', '', '30 segundos entre ejercicios'],
@@ -409,7 +412,7 @@ const SEED_GYM_WEEKS = [
       ['patada-gluteo-polea', '3', '12 reps por pierna'],
       ['up-lateral-polea', '3', '10 reps por pierna'],
       ['hip-thrust-barra-pulsos', '3', '10 reps + pulsos'],
-      ['squat-profundo-barra-banda', '3', '15 reps'],
+      ['sentadilla-smith', '3', '15 reps'],
     ],
     3: [
       ['ondas-cuerda', '', '1 minuto entre ejercicios (descanso activo)'],
@@ -460,7 +463,7 @@ const SEED_GYM_WEEKS = [
       ['sentadilla-hack', '3', '14 reps'],
       ['patada-gluteo-polea', '3', '8 reps por pierna'],
       ['peso-muerto-rumano-barra', '3', '10 reps (pesado)'],
-      ['abductor-unilateral', '3', '12 reps por pierna'],
+      ['abductor-polea-banda', '3', '12 reps por lado'],
       ['pantorrilla-sentada', '3', '10-12 reps'],
       ['kettlebell-swing', '4', '25 reps'],
     ],
@@ -479,10 +482,10 @@ const SEED_GYM_WEEKS = [
       ['sentadilla-pliometrica-3', '3', '20 reps'],
       ['zancada-lateral-kettlebell', '3', '12 reps por pierna'],
       ['squat-profundo-barra-banda', '3', '12 reps'],
-      ['bulgara-smith', '3', '12 reps por pierna'],
+      ['bulgara-landmine', '3', '12 reps por pierna'],
       ['step-up-polea', '3', '12 reps por pierna'],
       ['hip-thrust-barra', '3', '12-10-8 reps'],
-      ['abductores-maquina', '3', '20 reps'],
+      ['abductores-torso-inclinado', '3', '20 reps'],
       ['lenador-polea', '3', '10 reps por lado'],
       ['slam-medicine-ball', '3', '12 reps'],
     ],
@@ -525,7 +528,7 @@ const SEED_GYM_TOTAL_WEEKS = 7;
 
 // Subir este número cada vez que se cargan semanas nuevas: en los teléfonos que ya
 // tienen la app, se completan solas las semanas que todavía estaban vacías.
-const SEED_VERSION = 7;
+const SEED_VERSION = 8;
 
 // Ejercicios sumados después a días que ya estaban cargados. "since" es la
 // SEED_VERSION en que se agregaron; se suman solo si el día no los tiene.
@@ -536,6 +539,14 @@ const SEED_REPLACES = [
   { since: 6, week: 0, day: 4, from: 'extension-polea-lateral', to: ['extension-polea-lateral', '3', '12 reps por pierna'], onlyIfEmpty: true },
   { since: 6, week: 1, day: 1, from: 'estiramiento-tren-inferior', to: ['stretch-isquios-pnf', '', '3 rondas por pierna + 45 seg de paloma por lado'] },
   { since: 6, week: 1, day: 2, from: 'estiramientos-iv', to: ['stretch-couch-9090', '', '45 seg por lado + 5 transiciones 90/90'] },
+  // Sin repetir ejercicios dentro de la misma semana
+  { since: 8, week: 3, day: 4, from: 'bulgara-smith', to: ['bulgara-landmine', '3', '12 reps por pierna'] },
+  { since: 8, week: 3, day: 4, from: 'abductores-maquina', to: ['abductores-torso-inclinado', '3', '20 reps'] },
+  { since: 8, week: 3, day: 2, from: 'abductor-unilateral', to: ['abductor-polea-banda', '3', '12 reps por lado'] },
+  { since: 8, week: 2, day: 2, from: 'squat-profundo-barra-banda', to: ['sentadilla-smith', '3', '15 reps'] },
+  { since: 8, week: 1, day: 2, from: 'leg-extension-maquina', to: ['leg-extension-v', '3', '12-10-8 reps'] },
+  { since: 8, week: 1, day: 4, from: 'step-up-polea', to: ['up-lateral-polea', '3', '12 reps por lado'] },
+  { since: 8, week: 1, day: 4, from: 'pallof-press', to: ['lenador-polea', '3', '10 reps por lado'] },
 ];
 
 const SEED_APPENDS = [
