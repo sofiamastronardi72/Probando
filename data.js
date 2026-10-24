@@ -242,6 +242,26 @@ const SEED_EXERCISES = [
   { id: 'bridge-pierna-arriba-1-cuarto', name: 'Bridge con pierna arriba 1 y 1/4', muscle: 'Glúteo mayor', equipment: 'Peso corporal',
     description: 'Boca arriba con una pierna apoyada y la otra estirada hacia arriba. Subí la cadera completo, bajá solo un cuarto, volvé a subir y recién ahí bajá del todo: eso es 1 repetición. Que la cadera no se incline hacia el lado de la pierna que está arriba.' },
 
+  // ---- Semana 6 ----
+  { id: 'swing-kick', name: 'Swing con kick', muscle: 'Glúteo mayor', equipment: 'Kettlebell', description: '' },
+  { id: 'prensa-unilateral', name: 'Prensa unilateral', muscle: 'Cuádriceps (Recto femoral)', equipment: 'Prensa',
+    description: 'En la prensa con un solo pie apoyado en el centro de la plataforma. Bajá controlado hasta que la rodilla quede a 90° sin que se despegue la cadera del respaldo, y empujá con todo el pie. Todas de un lado y cambiá.' },
+  { id: 'run-plank', name: 'Run plank', muscle: 'Abdominales (Recto abdominal)', equipment: 'Peso corporal', description: '' },
+  { id: 'remo-menton-polea', name: 'Remo al mentón en polea', muscle: 'Deltoide lateral', equipment: 'Polea baja + barra o cuerda',
+    description: 'De frente a la polea baja con agarre cerrado. Tirá hacia arriba pegado al cuerpo llevando los codos hacia afuera y arriba, hasta la altura del pecho (no más alto, para cuidar el hombro). Bajá lento.' },
+  { id: 'abs-bicicleta', name: 'Abs bicicleta', muscle: 'Abdominales (Recto abdominal)', equipment: 'Peso corporal',
+    description: 'Boca arriba con las manos detrás de la cabeza y las piernas elevadas. Llevá un codo hacia la rodilla contraria mientras estirás la otra pierna, y alterná como pedaleando. Lento y sin tirar del cuello.' },
+  { id: 'press-acostada-toque', name: 'Press acostada con toque al piso', muscle: 'Abdominales (Recto abdominal)', equipment: 'Mancuerna / disco', description: '' },
+  { id: 'oblicuos-dos-piernas', name: 'Oblicuos a dos piernas', muscle: 'Oblicuos externos', equipment: 'Peso corporal', description: '' },
+  { id: 'sentadilla-smith-talones', name: 'Sentadilla en Smith con talones elevados y tempo lento', muscle: 'Cuádriceps (Recto femoral)', equipment: 'Máquina Smith + disco o cuña',
+    description: 'Talones apoyados sobre un disco o una cuña, barra del Smith en la espalda alta. Bajá en 3 segundos hasta abajo y subí normal. Con los talones elevados se trabaja más el cuádriceps.' },
+  { id: 'squat-rotacion-mancuerna', name: 'Squat con rotación de mancuerna', muscle: 'Glúteo mayor', equipment: 'Mancuerna', description: '' },
+  { id: 'adductor-semi-parada', name: 'Adductor semi parada', muscle: 'Aductor mayor', equipment: 'Máquina de aductores', description: '' },
+  { id: 'hold-deadbug', name: 'Dead bug sosteniendo disco o mancuerna', muscle: 'Transverso abdominal', equipment: 'Disco / mancuerna',
+    description: 'Boca arriba con las rodillas a 90° y los brazos estirados hacia el techo sosteniendo un disco. Con la zona lumbar pegada al piso, sostené la posición (o bajá piernas alternadas sin mover los brazos) durante el tiempo indicado.' },
+  { id: 'press-twist-mancuernas', name: 'Press con twist con mancuernas', muscle: 'Pecho (Pectoral mayor)', equipment: 'Mancuernas',
+    description: 'Acostada en el piso, mancuernas a la altura del pecho y abdomen firme. Empujá hacia arriba girando apenas las muñecas hacia adentro al final, y bajá controlado hasta que los codos toquen el piso.' },
+
   // ---- Estiramientos ----
   { id: 'stretch-couch-9090', name: 'Estiramiento: couch stretch + 90/90 de cadera', muscle: 'Flexores de cadera', equipment: 'Banco o pared + piso',
     description: '1) Couch stretch: rodilla de atrás apoyada en el piso con el empeine contra la pared o un banco, pie de adelante apoyado al frente. Apretá el glúteo de la pierna de atrás y llevá la cadera hacia adelante sin arquear la espalda. Estira cuádriceps y flexor de cadera, que se acortan con las sentadillas y con estar sentada. 45 seg por lado.\n2) 90/90: sentada en el piso con las dos piernas dobladas a 90° (una adelante y otra al costado). Girá las rodillas de un lado al otro, despacio y sin usar las manos si podés. 5 transiciones.' },
@@ -506,7 +526,62 @@ const SEED_GYM_WEEKS = [
     6: SATURDAY_CORE,
   },
   { 6: SATURDAY_CORE }, // Semana 5 (el resto se carga cuando lleguen las fotos)
-  { 6: SATURDAY_CORE }, // Semana 6 (el resto se carga cuando lleguen las fotos)
+  { // Semana 6
+    1: [
+      ['swing-kick', '3', '12 reps por pierna'],
+      ['abductores-maquina', '3', '20 reps'],
+      ['prensa-unilateral', '3', '10 reps por pierna'],
+      ['sentadilla-smith', '3', '10 reps'],
+      ['abductor-unilateral', '3', '15 reps por pierna'],
+      ['bulgara-smith', '3', '8 reps por pierna'],
+      ['reverse-lunge-polea-fly', '3', '12 reps por pierna'],
+      ['step-up-polea', '3', '10 reps por pierna'],
+    ],
+    2: [
+      ['lunge-curl-kick-banda', '2', '15 reps por pierna (calentamiento)'],
+      ['lunge-curl-barra', '3', '12 reps cada lado'],
+      ['femoral-unilateral', '3', '12 reps cada pierna'],
+      ['sentadilla-hack', '3', '12 reps'],
+      ['kick-polea', '3', '10 reps por pierna'],
+      ['hidrante-polea', '3', '12 reps por pierna'],
+      ['hip-thrust-barra-pulsos', '3', '12 reps + 10 pulsos'],
+      ['stretch-isquios-pnf', '', '3 rondas por pierna + 45 seg de paloma por lado'],
+    ],
+    3: [
+      ['run-plank', '', '1 minuto entre ejercicios (descanso activo)'],
+      ['elevacion-frontal-lateral-polea', '3', '10 reps por brazo'],
+      ['remo-menton-polea', '3', '10 reps'],
+      ['triceps-unilateral-polea', '3', '10 reps por brazo'],
+      ['abs-bicicleta', '3', '20 reps (10 por lado)'],
+      ['press-pecho-maquina', '3', '8-10 reps'],
+      ['press-acostada-toque', '3', '15 reps'],
+      ['oblicuos-dos-piernas', '3', '10 reps por lado'],
+    ],
+    4: [
+      ['sentadilla-smith-talones', '3', '12 reps (3 seg al bajar)'],
+      ['squat-rotacion-mancuerna', '3', '12 reps'],
+      ['peso-muerto-rumano-barra', '3', '12 reps'],
+      ['polea-arriba', '3', '12-15 reps por pierna'],
+      ['adductor-semi-parada', '4', 'En pirámide'],
+      ['abductor-polea-banda', '3', '12 reps por pierna'],
+      ['hip-thrust-maquina', '3', '12 reps'],
+      ['crunch-polea-alta', '3', '15 reps'],
+      ['slam-medicine-ball', '3', '12 reps'],
+    ],
+    5: [
+      ['reverse-pec-deck', '3', '10 reps'],
+      ['face-pull', '3', '10 reps'],
+      ['kickback-triceps-polea', '3', '10-12 reps por brazo'],
+      ['triceps-cuerda', '4', '10-12 reps'],
+      ['gorilla-row', '3', '12 reps'],
+      ['remo-polea-baja', '3', '12 reps'],
+      ['around-world-squat', '3', '8 reps'],
+      ['press-hombros-maquina', '3', '10 reps + 5 por brazo'],
+      ['hold-deadbug', '3', '45-60 seg'],
+      ['press-twist-mancuernas', '3', '10 reps'],
+    ],
+    6: SATURDAY_CORE,
+  },
   { 6: SATURDAY_CORE }, // Semana 7 (el resto se carga cuando lleguen las fotos)
 ];
 
@@ -531,7 +606,7 @@ const SEED_GYM_TOTAL_WEEKS = 7;
 
 // Subir este número cada vez que se cargan semanas nuevas: en los teléfonos que ya
 // tienen la app, se completan solas las semanas que todavía estaban vacías.
-const SEED_VERSION = 9;
+const SEED_VERSION = 10;
 
 // Ejercicios sumados después a días que ya estaban cargados. "since" es la
 // SEED_VERSION en que se agregaron; se suman solo si el día no los tiene.
