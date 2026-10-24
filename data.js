@@ -564,7 +564,7 @@ const SEED_GYM_WEEKS = [
       ['polea-arriba', '3', '12-15 reps por pierna'],
       ['adductor-semi-parada', '4', 'En pirámide'],
       ['abductor-polea-banda', '3', '12 reps por pierna'],
-      ['hip-thrust-maquina', '3', '12 reps'],
+      ['hip-thrust-barra-liga', '3', '12 reps'],
       ['crunch-polea-alta', '3', '15 reps'],
       ['slam-medicine-ball', '3', '12 reps'],
     ],
@@ -606,7 +606,7 @@ const SEED_GYM_TOTAL_WEEKS = 7;
 
 // Subir este número cada vez que se cargan semanas nuevas: en los teléfonos que ya
 // tienen la app, se completan solas las semanas que todavía estaban vacías.
-const SEED_VERSION = 10;
+const SEED_VERSION = 11;
 
 // Ejercicios sumados después a días que ya estaban cargados. "since" es la
 // SEED_VERSION en que se agregaron; se suman solo si el día no los tiene.
@@ -627,6 +627,8 @@ const SEED_REPLACES = [
   { since: 8, week: 1, day: 4, from: 'pallof-press', to: ['lenador-polea', '3', '10 reps por lado'] },
   // Pedido: volver al bridge original en S3 lunes
   { since: 9, week: 2, day: 1, from: 'hip-thrust-1-y-cuarto', to: ['bridge-pierna-arriba-1-cuarto', '2', '12 reps por lado'] },
+  // "rutina3-ej4" del original: hip thrust en banco con banda y mancuernas
+  { since: 11, week: 5, day: 4, from: 'hip-thrust-maquina', to: ['hip-thrust-barra-liga', '3', '12 reps'] },
 ];
 
 const SEED_APPENDS = [
