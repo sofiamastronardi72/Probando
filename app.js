@@ -87,6 +87,13 @@ function migrate(s) {
         if (!day.some(i => i.exId === exId)) day.push({ uid: uid(), exId, sets, reps });
       }
     }
+    for (const rep of SEED_REPLACES) {
+      if (rep.since <= (s.seedVersion || 0) || !weeks[rep.week]) continue;
+      for (const item of weeks[rep.week][rep.day]) {
+        if (item.exId !== rep.from || (rep.onlyIfEmpty && (item.sets || item.reps))) continue;
+        [item.exId, item.sets, item.reps] = rep.to;
+      }
+    }
     s.seedVersion = SEED_VERSION;
   }
   return s;

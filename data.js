@@ -176,6 +176,47 @@ const SEED_EXERCISES = [
   { id: 'stir-the-pot', name: 'Stir the pot en fitball', muscle: 'Transverso abdominal', equipment: 'Fitball',
     description: 'Plancha con los antebrazos sobre la pelota. Hacé círculos chicos con los antebrazos sin que se mueva la cadera ni se hunda la zona lumbar. Hacia un lado y después al otro.' },
 
+  // ---- Semana 3 ----
+  { id: 'side-squat-elevacion-brazo', name: 'Side squat con elevación de brazo', muscle: 'Glúteo medio', equipment: 'Peso corporal / mancuernas livianas', description: '' },
+  { id: 'squat-profundo-barra-banda', name: 'Squat profundo con barra y banda', muscle: 'Cuádriceps (Recto femoral)', equipment: 'Barra + banda',
+    description: 'Barra sobre la espalda alta y banda sobre las rodillas. Bajá lo más profundo que puedas con la espalda recta, empujando las rodillas hacia afuera contra la banda, y subí con todo el pie.' },
+  { id: 'hip-thrust-1-y-cuarto', name: 'Hip thrust con barra 1 y 1/4', muscle: 'Glúteo mayor', equipment: 'Barra + banco',
+    description: 'Espalda alta en el banco y barra sobre la cadera. Subí completo, bajá solo un cuarto, volvé a subir y recién ahí bajá del todo: eso es 1 repetición. Mantiene el glúteo trabajando arriba, donde más cuesta.' },
+  { id: 'hiperextension-gluteo', name: 'Hiperextensión 45° enfocada en glúteo', muscle: 'Glúteo mayor', equipment: 'Banco de hiperextensiones',
+    description: 'En el banco a 45° con el apoyo debajo de la cadera, espalda alta redondeada y puntas de los pies hacia afuera. Bajá el torso y subí empujando la cadera contra el apoyo y apretando glúteos, sin arquear la zona lumbar.' },
+  { id: 'sit-up-medicine-ball', name: 'Sit-up con lanzamiento de medicine ball', muscle: 'Abdominales (Recto abdominal)', equipment: 'Medicine ball + pared',
+    description: 'Sentada frente a una pared con las rodillas flexionadas y la pelota contra el pecho. Bajá la espalda hacia el piso, y al subir lanzá la pelota a la pared. Atrapala y repetí.' },
+  { id: 'lenador-bajo-alto', name: 'Leñador en polea (bajo a alto)', muscle: 'Oblicuos externos', equipment: 'Polea baja',
+    description: 'De costado a la polea baja, agarre con ambas manos cerca de la rodilla. Llevalo en diagonal hacia arriba, por encima del hombro contrario, girando el torso y pivotando el pie de atrás. Volvé controlado.' },
+  { id: 'deadlift-hexagonal', name: 'Deadlift con barra hexagonal', muscle: 'Glúteo mayor', equipment: 'Barra hexagonal (trap bar)',
+    description: 'Parada en el centro de la barra hexagonal. Bajá con la cadera atrás y el pecho alto, agarrá las manijas y subí empujando el piso con los pies hasta quedar derecha, apretando glúteos. Bajá con la misma técnica.' },
+  { id: 'up-lateral-polea', name: 'Up lateral en polea', muscle: 'Glúteo medio', equipment: 'Polea + cajón', description: '' },
+  { id: 'ondas-cuerda', name: 'Ondas alternadas con cuerda', muscle: 'Cardio (cuerpo completo)', equipment: 'Cuerdas de batalla',
+    description: 'Media sentadilla, una punta de la cuerda en cada mano. Subí y bajá los brazos alternados rápido para hacer ondas, con el abdomen firme. Se hace entre ejercicios como descanso activo.' },
+  { id: 'press-hombro-unilateral', name: 'Press de hombro con mancuerna unilateral', muscle: 'Deltoide anterior', equipment: 'Mancuerna',
+    description: 'De pie, una mancuerna a la altura del hombro. Empujala hacia arriba sin inclinarte hacia el otro lado (el abdomen trabaja para mantenerte derecha) y bajá controlado.' },
+  { id: 'rodilla-pecho-disco', name: 'Rodilla al pecho con disco', muscle: 'Abdominales (Recto abdominal)', equipment: 'Disco', description: '' },
+  { id: 'around-world-squat', name: 'Around the world en squat', muscle: 'Oblicuos externos', equipment: 'Disco / medicine ball', description: '' },
+  { id: 'elevacion-rodilla-disco', name: 'Elevación de rodilla con disco', muscle: 'Abdominales (Recto abdominal)', equipment: 'Disco', description: '' },
+  { id: 'calentamiento-gluteos', name: 'Calentamiento de glúteos sin máquina', muscle: 'Glúteo medio', equipment: 'Banda / peso corporal', description: '' },
+  { id: 'squat-progresivo', name: 'Squat progresivo', muscle: 'Cuádriceps (Recto femoral)', equipment: 'Barra', description: '' },
+  { id: 'reverse-pec-deck', name: 'Pec deck invertido (vuelo posterior en máquina)', muscle: 'Deltoide posterior', equipment: 'Máquina pec deck',
+    description: 'Sentada mirando al respaldo, manijas a la altura de los hombros. Abrí los brazos hacia atrás con los codos apenas flexionados, juntando los omóplatos, y volvé lento.' },
+  { id: 'elevacion-lateral-polea', name: 'Elevación lateral en polea', muscle: 'Deltoide lateral', equipment: 'Polea baja',
+    description: 'De costado a la polea baja, agarre en la mano de afuera. Elevá el brazo hacia el costado hasta la altura del hombro con el codo apenas flexionado, y bajá lento.' },
+  { id: 'remo-mancuerna-pie', name: 'Bent over row con mancuerna de pie', muscle: 'Espalda (Dorsal ancho)', equipment: 'Mancuerna pesada',
+    description: 'Inclinada hacia adelante con la espalda recta y una mano apoyada en un banco. Tirá la mancuerna hacia la cadera llevando el codo atrás, pausa arriba y bajá controlado. Pesado, sin girar el torso.' },
+  { id: 'row-barra-extendidas', name: 'Row con barra manos extendidas', muscle: 'Espalda (Dorsal ancho)', equipment: 'Barra', description: '' },
+  { id: 'press-pecho-maquina', name: 'Press de pecho en máquina', muscle: 'Pecho (Pectoral mayor)', equipment: 'Máquina de press de pecho',
+    description: 'Sentada con la espalda apoyada y las manijas a la altura del pecho. Empujá hacia adelante sin trabar los codos y volvé lento hasta sentir el estiramiento del pecho.' },
+  { id: 'side-to-side-abs', name: 'Side to side abs', muscle: 'Oblicuos externos', equipment: 'Peso corporal', description: '' },
+
+  // ---- Estiramientos ----
+  { id: 'stretch-couch-9090', name: 'Estiramiento: couch stretch + 90/90 de cadera', muscle: 'Flexores de cadera', equipment: 'Banco o pared + piso',
+    description: '1) Couch stretch: rodilla de atrás apoyada en el piso con el empeine contra la pared o un banco, pie de adelante apoyado al frente. Apretá el glúteo de la pierna de atrás y llevá la cadera hacia adelante sin arquear la espalda. Estira cuádriceps y flexor de cadera, que se acortan con las sentadillas y con estar sentada. 45 seg por lado.\n2) 90/90: sentada en el piso con las dos piernas dobladas a 90° (una adelante y otra al costado). Girá las rodillas de un lado al otro, despacio y sin usar las manos si podés. 5 transiciones.' },
+  { id: 'stretch-isquios-pnf', name: 'Estiramiento: isquios con banda (contraer-relajar) + paloma', muscle: 'Isquiotibiales (Bíceps femoral)', equipment: 'Banda',
+    description: '1) Boca arriba con una banda en el pie, subí la pierna estirada hasta sentir el isquio. Empujá contra la banda 5 seg sin mover la pierna, soltá y llevala un poco más arriba durante 20 seg. 3 rondas por pierna. Esta técnica (contraer-relajar) gana más rango que el estiramiento común.\n2) Paloma: desde cuatro apoyos, llevá una rodilla adelante con la pierna cruzada y la otra estirada atrás. Bajá el torso sobre la pierna de adelante y respirá. 45 seg por lado.' },
+
   // ---- Alternativas para "Cambiar" ----
   { id: 'hip-thrust-banco', name: 'Hip thrust en banco con disco', muscle: 'Glúteo mayor', equipment: 'Banco + disco',
     description: 'Parte alta de la espalda apoyada en un banco y un disco sobre la cadera. Elevá la cadera apretando glúteos hasta que el torso quede paralelo al piso.' },
@@ -235,7 +276,7 @@ const SEED_GYM_WEEKS = [
       ['hip-thrust-barra-liga', '3', '12 reps'],
       ['glute-bridge-smith', '3', '12 reps'],
       ['isometrico-prensa', '3', '1 minuto'],
-      ['estiramiento-tren-inferior', '', '1 minuto completo'],
+      ['stretch-couch-9090', '', '45 seg por lado + 5 transiciones 90/90'],
     ],
     3: [
       ['jumping-jack-mancuernas', '3', '25 reps'],
@@ -253,7 +294,7 @@ const SEED_GYM_WEEKS = [
       ['leg-extension-maquina', '3', '12 reps'],
       ['polea-arriba', '3', 'Al fallo por pierna'],
       ['patada-gluteo-polea', '3', '15 reps por pierna'],
-      ['extension-polea-lateral', '', ''],
+      ['extension-polea-lateral', '3', '12 reps por pierna'],
       ['hip-thrust-maquina', '3', '12 reps + 10 chiquititos al final de cada serie'],
       ['crunch-polea-alta', '3', '15 reps'],
       ['giro-medicine-ball', '3', '12 reps por lado'],
@@ -279,7 +320,7 @@ const SEED_GYM_WEEKS = [
       ['kick-polea', '3', '10 reps por pierna'],
       ['abductores-torso-inclinado', '3', '15 reps'],
       ['hip-thrust-barra-pulsos', '3', '12 reps + 10 pulsos'],
-      ['estiramiento-tren-inferior', '', '1 minuto completo'],
+      ['stretch-isquios-pnf', '', '3 rondas por pierna + 45 seg de paloma por lado'],
     ],
     2: [
       ['zancada-lateral-kettlebell', '3', '12 reps por lado'],
@@ -289,7 +330,7 @@ const SEED_GYM_WEEKS = [
       ['abductores-maquina', '3', '15 reps'],
       ['abductor-unilateral', '3', '12 reps por pierna'],
       ['adductor-88', '4', 'Como indica el ejercicio'],
-      ['estiramientos-iv', '', ''],
+      ['stretch-couch-9090', '', '45 seg por lado + 5 transiciones 90/90'],
     ],
     3: [
       ['jumping-jacks', '', '50 reps entre ejercicios'],
@@ -323,7 +364,60 @@ const SEED_GYM_WEEKS = [
     ],
     6: SATURDAY_CORE,
   },
-  { 6: SATURDAY_CORE }, // Semana 3 (el resto se carga cuando lleguen las fotos)
+  { // Semana 3
+    1: [
+      ['side-squat-elevacion-brazo', '3', '12 reps por lado'],
+      ['abductor-unilateral', '3', '10 reps por pierna'],
+      ['sentadilla-hack', '2', '12 reps'],
+      ['squat-profundo-barra-banda', '2', '12 reps'],
+      ['abductores-torso-inclinado', '3', '15 reps'],
+      ['hip-thrust-1-y-cuarto', '2', '12 reps'],
+      ['hiperextension-gluteo', '3', '12 reps'],
+      ['sit-up-medicine-ball', '3', '12 reps'],
+      ['lenador-bajo-alto', '3', '10 reps por lado'],
+    ],
+    2: [
+      ['curl-femoral-maquina', '3', '12 reps (2 seg al bajar)'],
+      ['deadlift-hexagonal', '3', '12 reps'],
+      ['leg-press-separadas', '3', '12 reps'],
+      ['pantorrilla-leg-press', '3', '10 reps'],
+      ['patada-gluteo-polea', '3', '12 reps por pierna'],
+      ['up-lateral-polea', '3', '10 reps por pierna'],
+      ['hip-thrust-barra-pulsos', '3', '10 reps + pulsos'],
+      ['squat-profundo-barra-banda', '3', '15 reps'],
+    ],
+    3: [
+      ['ondas-cuerda', '', '1 minuto entre ejercicios (descanso activo)'],
+      ['press-hombro-unilateral', '3', '8 reps por brazo'],
+      ['kickback-triceps-polea', '3', '10-12 reps por brazo'],
+      ['triceps-unilateral-polea', '3', '10-12 reps por brazo'],
+      ['rodilla-pecho-disco', '3', '12 reps por lado'],
+      ['elevacion-frontal-lateral-polea', '3', '12 reps por brazo'],
+      ['around-world-squat', '', '50 reps'],
+      ['elevacion-rodilla-disco', '3', '12 reps por lado'],
+    ],
+    4: [
+      ['calentamiento-gluteos', '3', '30 seg'],
+      ['squat-progresivo', '3', 'Series completas'],
+      ['zancada-atras-smith', '3', '12 reps por pierna'],
+      ['bulgara', '3', '10-12 reps por pierna'],
+      ['hip-thrust-barra-liga', '4', '12 reps'],
+      ['patada-cuadrupedia-polea', '3', '12 reps por pierna'],
+      ['glute-bridge-smith', '3', '12 reps'],
+      ['abductores-maquina', '3', '15 reps'],
+    ],
+    5: [
+      ['jumping-jacks', '', '50 reps entre ejercicios'],
+      ['reverse-pec-deck', '3', '12 reps'],
+      ['elevacion-lateral-polea', '3', '12 reps por brazo'],
+      ['remo-mancuerna-pie', '3', '8 reps por lado, pesado'],
+      ['latpull-barra', '3', '12 reps'],
+      ['row-barra-extendidas', '3', '12 reps'],
+      ['press-pecho-maquina', '3', '12 reps'],
+      ['side-to-side-abs', '3', '10 reps por lado'],
+    ],
+    6: SATURDAY_CORE,
+  },
   { 6: SATURDAY_CORE }, // Semana 4 (el resto se carga cuando lleguen las fotos)
   { 6: SATURDAY_CORE }, // Semana 5 (el resto se carga cuando lleguen las fotos)
   { 6: SATURDAY_CORE }, // Semana 6 (el resto se carga cuando lleguen las fotos)
@@ -351,10 +445,19 @@ const SEED_GYM_TOTAL_WEEKS = 7;
 
 // Subir este número cada vez que se cargan semanas nuevas: en los teléfonos que ya
 // tienen la app, se completan solas las semanas que todavía estaban vacías.
-const SEED_VERSION = 5;
+const SEED_VERSION = 6;
 
 // Ejercicios sumados después a días que ya estaban cargados. "since" es la
 // SEED_VERSION en que se agregaron; se suman solo si el día no los tiene.
+// Reemplazos en días ya cargados: cambia el ejercicio "from" por "to" si sigue ahí.
+// Con onlyIfEmpty, solo si el ejercicio todavía no tiene series ni repeticiones.
+const SEED_REPLACES = [
+  { since: 6, week: 0, day: 2, from: 'estiramiento-tren-inferior', to: ['stretch-couch-9090', '', '45 seg por lado + 5 transiciones 90/90'] },
+  { since: 6, week: 0, day: 4, from: 'extension-polea-lateral', to: ['extension-polea-lateral', '3', '12 reps por pierna'], onlyIfEmpty: true },
+  { since: 6, week: 1, day: 1, from: 'estiramiento-tren-inferior', to: ['stretch-isquios-pnf', '', '3 rondas por pierna + 45 seg de paloma por lado'] },
+  { since: 6, week: 1, day: 2, from: 'estiramientos-iv', to: ['stretch-couch-9090', '', '45 seg por lado + 5 transiciones 90/90'] },
+];
+
 const SEED_APPENDS = [
   { since: 5, week: 0, day: 1, items: [['lenador-polea', '3', '10 reps por lado'], ['slam-medicine-ball', '3', '12 reps']] },
   { since: 5, week: 0, day: 4, items: [['crunch-polea-alta', '3', '15 reps'], ['giro-medicine-ball', '3', '12 reps por lado']] },
