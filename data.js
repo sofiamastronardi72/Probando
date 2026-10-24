@@ -267,6 +267,33 @@ const SEED_EXERCISES = [
   { id: 'plank-rodilla-codo', name: 'Plank con rodilla a codo lento', muscle: 'Oblicuos externos', equipment: 'Peso corporal',
     description: 'En plancha alta con las manos bajo los hombros. Llevá despacio una rodilla hacia el codo del mismo lado, sin subir ni girar la cadera, y volvé. Alterná. Cuanto más lento, más trabaja el oblicuo.' },
 
+  // ---- Semana 7 ----
+  { id: 'jj-sentadilla-123', name: 'Jumping jack combinado con sentadilla 123', muscle: 'Glúteo mayor', equipment: 'Peso corporal', description: '' },
+  { id: 'in-out-jump-squat', name: 'In & Out Jump Squat', muscle: 'Glúteo mayor', equipment: 'Peso corporal',
+    description: 'En media sentadilla con los pies juntos, saltá abriendo las piernas y caé en sentadilla abierta. Volvé a saltar cerrando. Sin enderezarte del todo entre saltos y aterrizando suave.' },
+  { id: 'abduccion-polea-sentadilla', name: 'Abducción en polea con sentadilla', muscle: 'Glúteo mayor', equipment: 'Polea + tobillera', description: '' },
+  { id: 'kick-polea-elevacion-frontal', name: 'Kick en polea con elevaciones frontales con mancuernas', muscle: 'Glúteo mayor', equipment: 'Polea + mancuerna', description: '' },
+  { id: 'lunge-estatico-press-polea', name: 'Lunge estático con press de polea', muscle: 'Glúteo mayor', equipment: 'Polea', description: '' },
+  { id: 'triceps-overhead-polea', name: 'Extensión de tríceps sobre la cabeza en polea', muscle: 'Tríceps braquial', equipment: 'Polea + cuerda',
+    description: 'De espaldas a la polea, cuerda detrás de la cabeza y codos apuntando hacia adelante. Extendé los brazos hacia adelante y arriba sin mover los codos, y volvé lento. Trabaja el tríceps estirado, donde más crece.' },
+  { id: 'skull-crusher', name: 'Skull crusher con barra Z', muscle: 'Tríceps braquial', equipment: 'Barra Z + banco',
+    description: 'Acostada en el banco con la barra Z sobre el pecho y los brazos estirados. Flexioná solo los codos bajando la barra hacia la frente, sin abrir los codos, y volvé a estirar.' },
+  { id: 'dumbbell-jump-squat', name: 'Dumbbell jump squat', muscle: 'Cuádriceps (Recto femoral)', equipment: 'Mancuernas livianas',
+    description: 'Con una mancuerna liviana en cada mano, bajá en sentadilla y saltá hacia arriba de forma explosiva. Aterrizá suave, con las rodillas siguiendo la línea de los pies.' },
+  { id: 'peso-muerto-una-pierna', name: 'Peso muerto rumano a una pierna con kettlebell', muscle: 'Isquiotibiales (Bíceps femoral)', equipment: 'Kettlebell / mancuerna',
+    description: 'Parada sobre una pierna con la kettlebell en la mano contraria. Inclinate hacia adelante llevando la otra pierna estirada hacia atrás, cadera alineada y espalda recta, hasta sentir el isquio. Volvé apretando glúteo.' },
+  { id: 'stand-up-sin-manos', name: 'Stand up sin manos', muscle: 'Glúteo mayor', equipment: 'Peso corporal', description: '' },
+  { id: 'calentamiento-tren-superior', name: 'Calentamiento previo tren superior', muscle: 'Deltoide posterior', equipment: 'Banda / peso corporal', description: '' },
+  { id: 'boxeo-trote-fijo', name: 'Boxeo con trote fijo', muscle: 'Deltoide anterior', equipment: 'Peso corporal', description: '' },
+  { id: 'pullover-polea', name: 'Pullover en polea alta', muscle: 'Espalda (Dorsal ancho)', equipment: 'Polea alta + barra o cuerda',
+    description: 'De pie frente a la polea alta, torso apenas inclinado y brazos casi estirados. Llevá la barra hacia los muslos en arco, apretando la espalda, y volvé lento sin doblar los codos.' },
+  { id: 'around-world-sentada', name: 'Around the world sentada', muscle: 'Deltoide lateral', equipment: 'Disco / mancuernas', description: '' },
+  { id: 'aperturas-laterales-ab', name: 'Aperturas laterales en ab', muscle: 'Abdominales (Recto abdominal)', equipment: 'Mancuernas livianas', description: '' },
+  { id: 'press-inclinado-maquina', name: 'Press inclinado en máquina', muscle: 'Pecho (Pectoral mayor)', equipment: 'Máquina de press inclinado',
+    description: 'Sentada en la máquina inclinada con la espalda apoyada. Empujá las manijas hacia arriba y adelante sin trabar los codos, y volvé lento. Trabaja la parte alta del pecho, como la lagartija declinada.' },
+  { id: 'forward-plank-shift', name: 'Forward plank shift', muscle: 'Transverso abdominal', equipment: 'Peso corporal',
+    description: 'En plancha alta con las manos bajo los hombros. Desplazá el cuerpo hacia adelante, llevando los hombros más allá de las manos con los pies en puntas, y volvé, sin que la cadera suba ni se hunda.' },
+
   // ---- Estiramientos ----
   { id: 'stretch-couch-9090', name: 'Estiramiento: couch stretch + 90/90 de cadera', muscle: 'Flexores de cadera', equipment: 'Banco o pared + piso',
     description: '1) Couch stretch: rodilla de atrás apoyada en el piso con el empeine contra la pared o un banco, pie de adelante apoyado al frente. Apretá el glúteo de la pierna de atrás y llevá la cadera hacia adelante sin arquear la espalda. Estira cuádriceps y flexor de cadera, que se acortan con las sentadillas y con estar sentada. 45 seg por lado.\n2) 90/90: sentada en el piso con las dos piernas dobladas a 90° (una adelante y otra al costado). Girá las rodillas de un lado al otro, despacio y sin usar las manos si podés. 5 transiciones.' },
@@ -589,7 +616,62 @@ const SEED_GYM_WEEKS = [
     ],
     6: SATURDAY_CORE,
   },
-  { 6: SATURDAY_CORE }, // Semana 7 (el resto se carga cuando lleguen las fotos)
+  { // Semana 7
+    1: [
+      ['jj-sentadilla-123', '', '8 reps entre series'],
+      ['in-out-jump-squat', '2', '10 reps'],
+      ['bulgara-landmine', '3', '10 reps por pierna'],
+      ['deadlift-hexagonal', '3', '10 reps'],
+      ['squat-progresivo', '3', 'Series completas'],
+      ['abductores-maquina', '3', '15 reps'],
+      ['hidrante-polea', '2', '12 reps por pierna'],
+      ['hip-thrust-barra-liga', '3', '12 reps'],
+    ],
+    2: [
+      ['abduccion-polea-sentadilla', '3', '15 reps por pierna'],
+      ['kick-polea-elevacion-frontal', '3', '15 reps por pierna'],
+      ['lunge-estatico-press-polea', '2', '10 reps por lado'],
+      ['bulgara-smith', '3', '12 reps por pierna'],
+      ['leg-extension-v', '4', '15-12-10-8 reps'],
+      ['adductor-88', '4', 'Como indica el ejercicio'],
+      ['crunch-polea-oblicuo', '3', '10 reps por lado'],
+      ['v-up-medicine-ball', '3', '10 reps'],
+    ],
+    3: [
+      ['row-barra-extendidas', '3', '12 reps'],
+      ['latpull-barra', '3', '12 reps'],
+      ['triceps-unilateral-polea', '3', '15 reps por brazo'],
+      ['elevacion-frontal-polea', '3', '15 reps'],
+      ['press-hombros-maquina', '3', '12 reps'],
+      ['remo-unilateral-polea', '3', '12 reps por lado'],
+      ['triceps-overhead-polea', '3', '12 reps'],
+      ['elevacion-lateral-polea', '3', '12 reps por brazo'],
+    ],
+    4: [
+      ['dumbbell-jump-squat', '3', '10 reps'],
+      ['zancada-atras-smith', '3', '8 reps por pierna'],
+      ['sentadilla-smith', '3', '12 reps (bajar en 4 seg + 3 seg abajo)'],
+      ['peso-muerto-rumano-barra', '3', '10 reps'],
+      ['peso-muerto-una-pierna', '3', '12 reps por lado'],
+      ['hip-thrust-barra-pulsos', '4', '12 reps + 15 pulsos'],
+      ['farmer-walk', '', 'Al menos 40 pasos'],
+      ['stand-up-sin-manos', '', 'Al menos 3 intentos'],
+    ],
+    5: [
+      ['calentamiento-tren-superior', '3', '25 reps'],
+      ['boxeo-trote-fijo', '', '1 minuto entre ejercicios'],
+      ['remo-polea-baja', '3', '15 reps'],
+      ['pullover-polea', '3', '12 reps'],
+      ['around-world-sentada', '3', '12 reps'],
+      ['elevacion-frontal-lateral-polea', '3', '12 reps por brazo'],
+      ['aperturas-laterales-ab', '3', '12 reps'],
+      ['elevacion-rodilla-disco', '3', '12 reps por lado'],
+      ['press-inclinado-maquina', '3', '10 reps'],
+      ['forward-plank-shift', '2', '8 reps'],
+      ['skull-crusher', '3', '12 reps'],
+    ],
+    6: SATURDAY_CORE,
+  },
 ];
 
 // Reemplazos casa → gym, para actualizar programas ya guardados en el teléfono.
@@ -613,7 +695,7 @@ const SEED_GYM_TOTAL_WEEKS = 7;
 
 // Subir este número cada vez que se cargan semanas nuevas: en los teléfonos que ya
 // tienen la app, se completan solas las semanas que todavía estaban vacías.
-const SEED_VERSION = 12;
+const SEED_VERSION = 13;
 
 // Ejercicios sumados después a días que ya estaban cargados. "since" es la
 // SEED_VERSION en que se agregaron; se suman solo si el día no los tiene.
