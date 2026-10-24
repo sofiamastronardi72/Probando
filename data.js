@@ -239,6 +239,9 @@ const SEED_EXERCISES = [
   { id: 'bulgara-landmine', name: 'Sentadilla búlgara con landmine', muscle: 'Glúteo mayor', equipment: 'Barra en landmine + banco',
     description: 'Una punta de la barra fija en el landmine (o en un rincón) y la otra punta sostenida con las dos manos contra el pecho. Empeine de atrás en el banco. Bajá inclinando apenas el torso hacia la barra y empujá con el talón de adelante. Al cargar adelante, se trabaja más el glúteo y es más fácil mantener el equilibrio.' },
 
+  { id: 'bridge-pierna-arriba-1-cuarto', name: 'Bridge con pierna arriba 1 y 1/4', muscle: 'Glúteo mayor', equipment: 'Peso corporal',
+    description: 'Boca arriba con una pierna apoyada y la otra estirada hacia arriba. Subí la cadera completo, bajá solo un cuarto, volvé a subir y recién ahí bajá del todo: eso es 1 repetición. Que la cadera no se incline hacia el lado de la pierna que está arriba.' },
+
   // ---- Estiramientos ----
   { id: 'stretch-couch-9090', name: 'Estiramiento: couch stretch + 90/90 de cadera', muscle: 'Flexores de cadera', equipment: 'Banco o pared + piso',
     description: '1) Couch stretch: rodilla de atrás apoyada en el piso con el empeine contra la pared o un banco, pie de adelante apoyado al frente. Apretá el glúteo de la pierna de atrás y llevá la cadera hacia adelante sin arquear la espalda. Estira cuádriceps y flexor de cadera, que se acortan con las sentadillas y con estar sentada. 45 seg por lado.\n2) 90/90: sentada en el piso con las dos piernas dobladas a 90° (una adelante y otra al costado). Girá las rodillas de un lado al otro, despacio y sin usar las manos si podés. 5 transiciones.' },
@@ -399,7 +402,7 @@ const SEED_GYM_WEEKS = [
       ['sentadilla-hack', '2', '12 reps'],
       ['squat-profundo-barra-banda', '2', '12 reps'],
       ['abductores-torso-inclinado', '3', '15 reps'],
-      ['hip-thrust-1-y-cuarto', '2', '12 reps'],
+      ['bridge-pierna-arriba-1-cuarto', '2', '12 reps por lado'],
       ['hiperextension-gluteo', '3', '12 reps'],
       ['sit-up-medicine-ball', '3', '12 reps'],
       ['lenador-bajo-alto', '3', '10 reps por lado'],
@@ -528,7 +531,7 @@ const SEED_GYM_TOTAL_WEEKS = 7;
 
 // Subir este número cada vez que se cargan semanas nuevas: en los teléfonos que ya
 // tienen la app, se completan solas las semanas que todavía estaban vacías.
-const SEED_VERSION = 8;
+const SEED_VERSION = 9;
 
 // Ejercicios sumados después a días que ya estaban cargados. "since" es la
 // SEED_VERSION en que se agregaron; se suman solo si el día no los tiene.
@@ -547,6 +550,8 @@ const SEED_REPLACES = [
   { since: 8, week: 1, day: 2, from: 'leg-extension-maquina', to: ['leg-extension-v', '3', '12-10-8 reps'] },
   { since: 8, week: 1, day: 4, from: 'step-up-polea', to: ['up-lateral-polea', '3', '12 reps por lado'] },
   { since: 8, week: 1, day: 4, from: 'pallof-press', to: ['lenador-polea', '3', '10 reps por lado'] },
+  // Pedido: volver al bridge original en S3 lunes
+  { since: 9, week: 2, day: 1, from: 'hip-thrust-1-y-cuarto', to: ['bridge-pierna-arriba-1-cuarto', '2', '12 reps por lado'] },
 ];
 
 const SEED_APPENDS = [
