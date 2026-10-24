@@ -211,6 +211,31 @@ const SEED_EXERCISES = [
     description: 'Sentada con la espalda apoyada y las manijas a la altura del pecho. Empujá hacia adelante sin trabar los codos y volvé lento hasta sentir el estiramiento del pecho.' },
   { id: 'side-to-side-abs', name: 'Side to side abs', muscle: 'Oblicuos externos', equipment: 'Peso corporal', description: '' },
 
+  // ---- Semana 4 ----
+  { id: 'sentadilla-pliometrica-salto2', name: 'Sentadilla pliométrica con salto en 2', muscle: 'Cuádriceps (Recto femoral)', equipment: 'Peso corporal', description: '' },
+  { id: 'reverse-lunge-polea-fly', name: 'Reverse lunge en polea con arm to fly', muscle: 'Glúteo mayor', equipment: 'Polea', description: '' },
+  { id: 'hidrante-polea', name: 'Hidrante en polea', muscle: 'Glúteo medio', equipment: 'Polea baja + tobillera',
+    description: 'En cuatro apoyos de costado a la polea baja, con la tobillera en la pierna de afuera. Abrí la rodilla hacia el costado (como el hidrante) contra la resistencia de la polea, sin rotar la cadera, y volvé lento.' },
+  { id: 'bulgara-smith', name: 'Sentadilla búlgara en Smith', muscle: 'Glúteo mayor', equipment: 'Máquina Smith + banco',
+    description: 'Barra del Smith sobre la espalda alta y el empeine de atrás apoyado en un banco. Bajá flexionando la pierna de adelante con el torso apenas inclinado y empujá con el talón para subir. El Smith te deja cargar más peso con estabilidad.' },
+  { id: 'pantorrilla-sentada', name: 'Pantorrilla sentada en máquina', muscle: 'Pantorrillas (Sóleo)', equipment: 'Máquina de gemelos sentada',
+    description: 'Sentada con las rodillas bajo el apoyo y la parte delantera de los pies en el escalón. Bajá los talones lo más que puedas y subí en puntas, pausa arriba. Sentada se trabaja más el sóleo.' },
+  { id: 'kettlebell-swing', name: 'Kettlebell swings', muscle: 'Glúteo mayor', equipment: 'Kettlebell',
+    description: 'Pies un poco más abiertos que la cadera. Llevá la kettlebell entre las piernas con la cadera hacia atrás y la espalda recta, y proyectala hacia adelante hasta la altura del pecho con un empuje fuerte de cadera y glúteos. Los brazos solo acompañan.' },
+  { id: 'mountain-climbers', name: 'Mountain climbers', muscle: 'Abdominales (Recto abdominal)', equipment: 'Peso corporal',
+    description: 'En plancha alta con las manos bajo los hombros. Llevá las rodillas al pecho alternadas y rápido, sin subir la cadera.' },
+  { id: 'crunch-polea-oblicuo', name: 'Crunch en polea alta con giro', muscle: 'Oblicuos externos', equipment: 'Polea alta + cuerda',
+    description: 'Arrodillada frente a la polea, cuerda a los costados de la cabeza. Enrollá el torso llevando un codo hacia la rodilla contraria. Volvé y alterná de lado.' },
+  { id: 'v-up-medicine-ball', name: 'V-up con medicine ball', muscle: 'Abdominales (Recto abdominal)', equipment: 'Medicine ball',
+    description: 'Boca arriba con la pelota en las manos sobre la cabeza. Subí a la vez piernas y torso y pasá la pelota a los pies. Bajá controlado y repetí devolviéndola a las manos. Si cuesta, flexioná las rodillas.' },
+  { id: 'sentadilla-pliometrica-3', name: 'Sentadilla pliométrica a 3 puntos', muscle: 'Cuádriceps (Recto femoral)', equipment: 'Peso corporal', description: '' },
+  { id: 'hip-thrust-barra', name: 'Hip thrust con barra', muscle: 'Glúteo mayor', equipment: 'Barra + banco',
+    description: 'Espalda alta en el banco y barra sobre la cadera con protector. Elevá la cadera apretando glúteos hasta quedar alineada, mentón hacia el pecho, y bajá controlado. Con 12-10-8, subí el peso en cada serie.' },
+  { id: 'gorilla-row', name: 'Gorilla row', muscle: 'Espalda (Dorsal ancho)', equipment: '2 kettlebells / mancuernas',
+    description: 'Piernas abiertas, cadera atrás y torso inclinado, una pesa en el piso a cada lado. Remá una por vez llevando el codo hacia atrás, mientras la otra mano empuja la otra pesa contra el piso. Alterná sin girar el torso.' },
+  { id: 'pec-deck', name: 'Aperturas en pec deck', muscle: 'Pecho (Pectoral mayor)', equipment: 'Máquina pec deck',
+    description: 'Sentada con la espalda apoyada y los brazos abiertos a la altura del pecho. Juntá las manos adelante apretando el pecho, con los codos apenas flexionados, y abrí lento.' },
+
   // ---- Estiramientos ----
   { id: 'stretch-couch-9090', name: 'Estiramiento: couch stretch + 90/90 de cadera', muscle: 'Flexores de cadera', equipment: 'Banco o pared + piso',
     description: '1) Couch stretch: rodilla de atrás apoyada en el piso con el empeine contra la pared o un banco, pie de adelante apoyado al frente. Apretá el glúteo de la pierna de atrás y llevá la cadera hacia adelante sin arquear la espalda. Estira cuádriceps y flexor de cadera, que se acortan con las sentadillas y con estar sentada. 45 seg por lado.\n2) 90/90: sentada en el piso con las dos piernas dobladas a 90° (una adelante y otra al costado). Girá las rodillas de un lado al otro, despacio y sin usar las manos si podés. 5 transiciones.' },
@@ -418,7 +443,62 @@ const SEED_GYM_WEEKS = [
     ],
     6: SATURDAY_CORE,
   },
-  { 6: SATURDAY_CORE }, // Semana 4 (el resto se carga cuando lleguen las fotos)
+  { // Semana 4
+    1: [
+      ['sentadilla-pliometrica-salto2', '2', '15 reps entre ejercicios'],
+      ['sentadilla-smith', '3', '12 reps'],
+      ['abductores-maquina', '2', '15 reps'],
+      ['patada-cuadrupedia-polea', '3', '15 reps por pierna'],
+      ['abductor-unilateral', '3', '12 reps por pierna'],
+      ['reverse-lunge-polea-fly', '2', '12 reps por pierna'],
+      ['hip-thrust-maquina', '3', '12 reps + 10 chiquititos al final de cada serie'],
+      ['hidrante-polea', '3', '12 reps por pierna'],
+    ],
+    2: [
+      ['bulgara-smith', '3', '12 reps por pierna'],
+      ['zancada-atras-smith', '3', '12 reps por pierna'],
+      ['sentadilla-hack', '3', '14 reps'],
+      ['patada-gluteo-polea', '3', '8 reps por pierna'],
+      ['peso-muerto-rumano-barra', '3', '10 reps (pesado)'],
+      ['abductor-unilateral', '3', '12 reps por pierna'],
+      ['pantorrilla-sentada', '3', '10-12 reps'],
+      ['kettlebell-swing', '4', '25 reps'],
+    ],
+    3: [
+      ['remo-mancuerna-pie', '3', '10 reps por brazo'],
+      ['reverse-pec-deck', '3', '10 reps'],
+      ['elevacion-frontal-lateral-polea', '3', '10 reps por brazo'],
+      ['remo-polea-baja', '3', '10 reps'],
+      ['latpull-barra', '3', '10 reps'],
+      ['dragon-fly', '3', '10 reps'],
+      ['mountain-climbers', '3', '10 reps por pierna'],
+      ['crunch-polea-oblicuo', '3', '10 reps por lado'],
+      ['v-up-medicine-ball', '3', '10 reps'],
+    ],
+    4: [
+      ['sentadilla-pliometrica-3', '3', '20 reps'],
+      ['zancada-lateral-kettlebell', '3', '12 reps por pierna'],
+      ['squat-profundo-barra-banda', '3', '12 reps'],
+      ['bulgara-smith', '3', '12 reps por pierna'],
+      ['step-up-polea', '3', '12 reps por pierna'],
+      ['hip-thrust-barra', '3', '12-10-8 reps'],
+      ['abductores-maquina', '3', '20 reps'],
+      ['lenador-polea', '3', '10 reps por lado'],
+      ['slam-medicine-ball', '3', '12 reps'],
+    ],
+    5: [
+      ['press-hombros-maquina', '3', '15 reps'],
+      ['gorilla-row', '3', '15 reps'],
+      ['row-barra-extendidas', '3', '15 reps'],
+      ['triceps-cuerda', '3', '15 reps'],
+      ['pec-deck', '3', '10 reps'],
+      ['elevacion-lateral-polea', '3', '15 reps por brazo'],
+      ['press-pecho-maquina', '3', '8-10 reps'],
+      ['crunch-polea-alta', '3', '15 reps'],
+      ['giro-medicine-ball', '3', '12 reps por lado'],
+    ],
+    6: SATURDAY_CORE,
+  },
   { 6: SATURDAY_CORE }, // Semana 5 (el resto se carga cuando lleguen las fotos)
   { 6: SATURDAY_CORE }, // Semana 6 (el resto se carga cuando lleguen las fotos)
   { 6: SATURDAY_CORE }, // Semana 7 (el resto se carga cuando lleguen las fotos)
@@ -445,7 +525,7 @@ const SEED_GYM_TOTAL_WEEKS = 7;
 
 // Subir este número cada vez que se cargan semanas nuevas: en los teléfonos que ya
 // tienen la app, se completan solas las semanas que todavía estaban vacías.
-const SEED_VERSION = 6;
+const SEED_VERSION = 7;
 
 // Ejercicios sumados después a días que ya estaban cargados. "since" es la
 // SEED_VERSION en que se agregaron; se suman solo si el día no los tiene.
