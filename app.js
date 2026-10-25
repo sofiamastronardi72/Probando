@@ -371,7 +371,9 @@ function renderHoy() {
       <button class="date-nav" id="next" aria-label="Día siguiente">›</button>
     </div>` + weekBanner();
 
-  if (!items.length) {
+  if (isRestSunday(ui.date)) {
+    html += `<div class="empty"><p>Domingo de descanso 😌</p><button class="btn secondary" id="go-monday">Ver el lunes</button></div>`;
+  } else if (!items.length) {
     html += `<div class="empty">` + (inProgram
       ? `<p>No hay ejercicios para este ${DAY_NAMES[weekday].toLowerCase()}.</p><button class="btn" id="go-week">Armar este día</button>`
       : `<p>Fuera del programa.</p><button class="btn secondary" id="go-today">Ir a hoy</button>`) + `</div>`;
@@ -427,6 +429,8 @@ function renderHoy() {
   $('#next').onclick = () => shiftDate(1);
   const goWeek = $('#go-week');
   if (goWeek) goWeek.onclick = () => { syncWeekToDate(); ui.tab = 'semana'; render(); };
+  const goMonday = $('#go-monday');
+  if (goMonday) goMonday.onclick = () => shiftDate(1);
   const goToday = $('#go-today');
   if (goToday) goToday.onclick = () => { ui.date = today; render(); };
 
@@ -447,9 +451,14 @@ function renderHoy() {
   document.querySelectorAll('[data-weight]').forEach(inp => inp.onchange = () => setWeight(inp.dataset.weight, ui.date, inp.value));
 }
 
+// Los domingos sin ejercicios no se muestran: las flechas los saltan.
+function isRestSunday(iso) {
+  return fromISO(iso).getDay() === 0 && !(itemsFor(iso) || []).length;
+}
+
 function shiftDate(n) {
   const d = fromISO(ui.date);
-  d.setDate(d.getDate() + n);
+  do d.setDate(d.getDate() + n); while (isRestSunday(toISO(d)));
   ui.date = toISO(d); ui.open = null; render();
 }
 
@@ -492,6 +501,7 @@ function renderSemana() {
   const p = program();
   ui.weekIdx = clampWeek(ui.weekIdx);
   const week = p.weeks[ui.weekIdx];
+  if (ui.weekDay === 0 && !week[0].length) ui.weekDay = 1;
   const items = week[ui.weekDay];
   const multi = p.weeks.length > 1;
 
@@ -501,7 +511,7 @@ function renderSemana() {
       `<button data-week="${i}" class="${i === ui.weekIdx ? 'on' : ''}">S${i + 1}${Object.values(w).some(d => d.length) ? '' : ' ·'}</button>`
     ).join('') + `<button id="add-week" aria-label="Agregar semana">+</button></div>`;
   }
-  html += `<div class="days">` + WEEK_ORDER.map(d =>
+  html += `<div class="days">` + WEEK_ORDER.filter(d => d !== 0 || week[0].length).map(d =>
     `<button data-day="${d}" class="${d === ui.weekDay ? 'on' : ''}">${DAY_SHORT[d]}${week[d].length ? '<span class="dot"></span>' : ''}</button>`
   ).join('') + `</div>
     <div class="row between" style="margin-bottom:8px">
