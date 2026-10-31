@@ -58,6 +58,14 @@ h1 b{color:var(--ink)}
 .status.err{color:var(--warn)}
 button.refresh{border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:8px 14px; font:inherit; font-size:.85rem; cursor:pointer}
 .note{font-size:.78rem; color:var(--muted); margin:0}
+.big .src{display:block; margin-top:6px; font:400 .7rem/1.35 var(--display); opacity:.85; word-break:normal}
+.mic{flex:none; width:48px; height:48px; border-radius:50%; border:1px solid var(--line); background:var(--bg); color:var(--accent); display:grid; place-items:center; cursor:pointer; align-self:center}
+.mic svg{width:22px; height:22px}
+.mic:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.mic.on{background:var(--warn); border-color:var(--warn); color:#fff; animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+@media (prefers-reduced-motion: reduce){.mic.on{animation:none}}
+.heard{font-size:.8rem; color:var(--muted); min-height:1.1em; margin-top:2px}
 </style>
 </head>
 <body>
@@ -66,12 +74,14 @@ button.refresh{border:1px solid var(--line); background:var(--surface); color:va
 
   <div class="entry">
     <label for="brl">Importe en reales</label>
-    <div class="amount"><span>R$</span><input id="brl" inputmode="decimal" autocomplete="off" value="100" aria-label="Importe en reales"></div>
+    <div class="amount"><span>R$</span><input id="brl" inputmode="decimal" autocomplete="off" value="100" aria-label="Importe en reales">
+      <button class="mic" id="mic" type="button" aria-label="Dictar importe" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button></div>
+    <div class="heard" id="heard"></div>
   </div>
 
   <div class="result">
-    <div class="big"><small id="arsLabel">Pesos</small><div id="ars">—</div></div>
-    <div class="big usd"><small>Dólares</small><div id="usd">—</div></div>
+    <div class="big"><small id="arsLabel">Pesos</small><div id="ars">—</div><span class="src" id="arsSrc"></span></div>
+    <div class="big usd"><small>Dólares</small><div id="usd">—</div><span class="src" id="usdSrc"></span></div>
   </div>
 
   <section class="rates" aria-label="Cotizaciones">
@@ -80,7 +90,7 @@ button.refresh{border:1px solid var(--line); background:var(--surface); color:va
   </section>
 
   <div class="status" id="status"><span id="statusText">Buscando cotizaciones…</span><button class="refresh" id="refresh">Actualizar</button></div>
-  <p class="note">Real oficial: Banco Nación. Blue, MEP y tarjeta: real → dólar a valor de mercado internacional y después dólar → pesos. Se usa el precio de venta. Fuentes: dolarapi.com y open.er-api.com.</p>
+  <p class="note">Real oficial: Banco Nación. Blue, MEP, oficial y tarjeta: real → dólar a valor de mercado internacional y después dólar → pesos. Se usa el precio de venta. Fuentes: dolarapi.com y open.er-api.com.</p>
 </main>
 
 <script>
@@ -97,7 +107,7 @@ const store = {
   set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 };
 let rates = store.get('rates');          // { usdBrl, ars:{real,blue,...}, at, fetched }
-let pick = store.get('pick') || 'blue';
+let pick = store.get('pick-v2') || 'bolsa';
 
 const fmtARS = n => '$ ' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
 const fmtUSD = n => 'US$ ' + n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -142,6 +152,15 @@ function render(){
   $('arsLabel').textContent = 'Pesos · ' + (opt ? opt.name.replace('Vía dólar ','') : '');
   $('ars').textContent = (r != null && ok) ? fmtARS(brl * r) : '—';
   $('usd').textContent = (rates && rates.usdBrl && ok) ? fmtUSD(brl / rates.usdBrl) : '—';
+  const usdSrc = rates && rates.usdBrl ? `US$ 1 = R$ ${fmtRate(rates.usdBrl)} · ${rates.usdBrlSrc || 'open.er-api.com'}` : '';
+  $('usdSrc').textContent = usdSrc;
+  let arsSrc = '';
+  if (r != null){
+    arsSrc = pick === 'real'
+      ? `Real oficial venta R$ 1 = $ ${fmtRate(rates.ars.real)} · Banco Nación vía dolarapi.com`
+      : `Dólar ${opt.name.replace('Vía dólar ','')} venta US$ 1 = $ ${fmtRate(rates.ars[pick])} · dolarapi.com`;
+  }
+  $('arsSrc').textContent = arsSrc;
 }
 
 async function getJSON(url){
@@ -151,9 +170,9 @@ async function getJSON(url){
 }
 
 async function fetchUsdBrl(){
-  try{ const j = await getJSON('https://open.er-api.com/v6/latest/USD'); if (j.rates && j.rates.BRL) return j.rates.BRL; }catch(e){}
+  try{ const j = await getJSON('https://open.er-api.com/v6/latest/USD'); if (j.rates && j.rates.BRL) return { v:j.rates.BRL, src:'open.er-api.com' }; }catch(e){}
   const j = await getJSON('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json');
-  return j.usd.brl;
+  return { v:j.usd.brl, src:'currency-api (jsdelivr)' };
 }
 
 async function update(){
@@ -170,12 +189,12 @@ async function update(){
     next.at = dol.value.map(d => d.fechaActualizacion).filter(Boolean).sort().pop() || null;
   }
   if (real.status === 'fulfilled' && real.value && real.value.venta) next.ars.real = real.value.venta;
-  if (usdBrl.status === 'fulfilled') next.usdBrl = usdBrl.value;
+  if (usdBrl.status === 'fulfilled'){ next.usdBrl = usdBrl.value.v; next.usdBrlSrc = usdBrl.value.src; }
 
   const gotSomething = Object.keys(next.ars).length && (next.usdBrl || next.ars.real);
   if (gotSomething){
     // si una fuente falló, conservar el último dato guardado de esa fuente
-    if (rates){ next.usdBrl ??= rates.usdBrl; next.ars = { ...rates.ars, ...next.ars }; }
+    if (rates){ if (!next.usdBrl){ next.usdBrl = rates.usdBrl; next.usdBrlSrc = rates.usdBrlSrc; } next.ars = { ...rates.ars, ...next.ars }; }
     rates = next; store.set('rates', rates);
     showStatus();
   } else {
@@ -199,12 +218,69 @@ $('brl').addEventListener('input', render);
 $('brl').addEventListener('focus', e => e.target.select());
 $('rows').addEventListener('click', e => {
   const b = e.target.closest('.row[data-id]'); if (!b) return;
-  pick = b.dataset.id; store.set('pick', pick); render();
+  pick = b.dataset.id; store.set('pick-v2', pick); render();
 });
 $('refresh').addEventListener('click', update);
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && (!rates || Date.now() - rates.fetched > 10*60*1000)) update();
 });
+
+// ---- Dictado por voz ----
+const NUM = { un:1, uno:1, una:1, dos:2, tres:3, cuatro:4, cinco:5, seis:6, siete:7, ocho:8, nueve:9, diez:10,
+  once:11, doce:12, trece:13, catorce:14, quince:15, dieciseis:16, diecisiete:17, dieciocho:18, diecinueve:19,
+  veinte:20, veintiun:21, veintiuno:21, veintidos:22, veintitres:23, veinticuatro:24, veinticinco:25, veintiseis:26,
+  veintisiete:27, veintiocho:28, veintinueve:29, treinta:30, cuarenta:40, cincuenta:50, sesenta:60, setenta:70,
+  ochenta:80, noventa:90, cien:100, ciento:100, doscientos:200, trescientos:300, cuatrocientos:400, quinientos:500,
+  seiscientos:600, setecientos:700, ochocientos:800, novecientos:900 };
+function sumWords(text){
+  let total = 0, cur = 0, found = false;
+  for (const t of text.split(/\s+/)){
+    let v = null;
+    if (/^\d[\d.,]*$/.test(t)) v = parseAmount(t);
+    else if (t in NUM) v = NUM[t];
+    if (v != null && isFinite(v)){ cur += v; found = true; continue; }
+    if (t === 'mil'){ cur = (cur || 1) * 1000; total += cur; cur = 0; found = true; }
+    else if (t === 'millon' || t === 'millones'){ total = (total + (cur || 1)) * 1e6; cur = 0; found = true; }
+  }
+  return found ? total + cur : null;
+}
+function speechToAmount(raw){
+  const s = raw.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/r\$|\$/g, ' ').replace(/[^\w\s.,]/g, ' ')
+    .replace(/(\d)\s*k\b/g, '$1 mil');
+  const [ent, dec] = s.split(/\b(?:con|coma|punto)\b/);
+  const a = sumWords(ent || '');
+  if (a == null) return null;
+  const c = dec ? sumWords(dec) : null;
+  return c != null && c < 100 ? a + c / 100 : a;
+}
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SR){
+  const mic = $('mic'); mic.hidden = false;
+  let rec = null;
+  mic.addEventListener('click', () => {
+    if (rec){ rec.stop(); return; }
+    rec = new SR(); rec.lang = 'es-AR'; rec.interimResults = false; rec.maxAlternatives = 3;
+    mic.classList.add('on'); mic.setAttribute('aria-label', 'Dejar de escuchar');
+    $('heard').textContent = 'Escuchando… decí por ejemplo "300 reales"';
+    rec.onresult = e => {
+      const alts = Array.from(e.results[0]).map(a => a.transcript);
+      let n = null; for (const t of alts){ n = speechToAmount(t); if (n != null) break; }
+      if (n != null){
+        $('brl').value = n.toLocaleString('es-AR', { maximumFractionDigits: 2 });
+        $('heard').textContent = `Escuché: "${alts[0]}"`; render();
+      } else $('heard').textContent = `Escuché "${alts[0]}" pero no encontré un número. Probá de nuevo.`;
+    };
+    rec.onerror = e => {
+      $('heard').textContent = e.error === 'not-allowed' || e.error === 'service-not-allowed'
+        ? 'El micrófono está bloqueado. Habilitalo en los permisos del navegador.'
+        : e.error === 'no-speech' ? 'No escuché nada. Tocá el micrófono y probá de nuevo.' : 'No pude usar el dictado (' + e.error + ').';
+    };
+    rec.onend = () => { rec = null; mic.classList.remove('on'); mic.setAttribute('aria-label', 'Dictar importe');
+      if ($('heard').textContent.startsWith('Escuchando')) $('heard').textContent = ''; };
+    try{ rec.start(); }catch(err){ rec.onend(); }
+  });
+}
 
 render(); showStatus(); update();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
