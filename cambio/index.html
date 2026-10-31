@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f5b4c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Reales">
+<title>Reales a Pesos</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: una columna — importe arriba, resultado grande, tabla de cotizaciones abajo */
+:root{
+  --bg:#f3f6f4; --surface:#ffffff; --ink:#13231f; --muted:#5d6f69; --line:#dbe4e0;
+  --accent:#0f5b4c; --accent-ink:#ffffff; --sun:#c8961c; --warn:#a4461f;
+  --display:"Familjen Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0d1714; --surface:#15231f; --ink:#e6efeb; --muted:#93a8a1; --line:#25372f;
+    --accent:#3fb497; --accent-ink:#06120e; --sun:#f2c94c; --warn:#f08a5d; color-scheme:dark }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg); color:var(--ink); font:16px/1.45 var(--display);
+  padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));}
+main{max-width:460px; margin:0 auto; display:flex; flex-direction:column; gap:18px}
+h1{font-size:1.05rem; margin:0; letter-spacing:.02em; color:var(--muted); font-weight:500}
+h1 b{color:var(--ink)}
+.entry{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:14px 16px}
+.entry label{font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted)}
+.amount{display:flex; align-items:baseline; gap:8px}
+.amount span{font:600 1.6rem var(--mono); color:var(--sun)}
+.amount input{flex:1; min-width:0; border:0; background:transparent; color:var(--ink);
+  font:600 2.4rem var(--mono); padding:4px 0; outline:none}
+.entry:focus-within{border-color:var(--accent)}
+.result{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.big{background:var(--accent); color:var(--accent-ink); border-radius:18px; padding:14px 16px; min-width:0}
+.big small{font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; opacity:.85}
+.big div{font:600 1.45rem var(--mono); word-break:break-all; font-variant-numeric:tabular-nums}
+.big.usd{background:var(--surface); color:var(--ink); border:1px solid var(--line)}
+.sub{font-size:.85rem; color:var(--muted)}
+.rates{background:var(--surface); border:1px solid var(--line); border-radius:18px; overflow:hidden}
+.rates p{margin:0; padding:12px 16px 4px; font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted)}
+.row{display:grid; grid-template-columns:22px 1fr auto; gap:10px; align-items:center; width:100%;
+  padding:11px 16px; border:0; border-top:1px solid var(--line); background:none; color:inherit; font:inherit; text-align:left; cursor:pointer}
+.row:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+.dot{width:16px; height:16px; border-radius:50%; border:2px solid var(--line)}
+.row[aria-pressed="true"] .dot{border-color:var(--accent); background:var(--accent); box-shadow:inset 0 0 0 3px var(--surface)}
+.row b{font-weight:700}
+.row .rate{display:block; font:400 .74rem var(--mono); color:var(--muted)}
+.row .val{font:600 1rem var(--mono); font-variant-numeric:tabular-nums; text-align:right}
+.status{display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:.82rem; color:var(--muted)}
+.status.err{color:var(--warn)}
+button.refresh{border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:8px 14px; font:inherit; font-size:.85rem; cursor:pointer}
+.note{font-size:.78rem; color:var(--muted); margin:0}
+</style>
+</head>
+<body>
+<main>
+  <h1><b>Reales</b> → pesos y dólares</h1>
+
+  <div class="entry">
+    <label for="brl">Importe en reales</label>
+    <div class="amount"><span>R$</span><input id="brl" inputmode="decimal" autocomplete="off" value="100" aria-label="Importe en reales"></div>
+  </div>
+
+  <div class="result">
+    <div class="big"><small id="arsLabel">Pesos</small><div id="ars">—</div></div>
+    <div class="big usd"><small>Dólares</small><div id="usd">—</div></div>
+  </div>
+
+  <section class="rates" aria-label="Cotizaciones">
+    <p>Pesos según cotización (tocá una para usarla arriba)</p>
+    <div id="rows"></div>
+  </section>
+
+  <div class="status" id="status"><span id="statusText">Buscando cotizaciones…</span><button class="refresh" id="refresh">Actualizar</button></div>
+  <p class="note">Real oficial: Banco Nación. Blue, MEP y tarjeta: real → dólar a valor de mercado internacional y después dólar → pesos. Se usa el precio de venta. Fuentes: dolarapi.com y open.er-api.com.</p>
+</main>
+
+<script>
+const OPTIONS = [
+  { id:'real',    name:'Real oficial', hint:'Banco Nación' },
+  { id:'blue',    name:'Vía dólar blue' },
+  { id:'bolsa',   name:'Vía dólar MEP' },
+  { id:'oficial', name:'Vía dólar oficial' },
+  { id:'tarjeta', name:'Vía dólar tarjeta', hint:'compras con tarjeta' },
+];
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let rates = store.get('rates');          // { usdBrl, ars:{real,blue,...}, at, fetched }
+let pick = store.get('pick') || 'blue';
+
+const fmtARS = n => '$ ' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+const fmtUSD = n => 'US$ ' + n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtRate = n => n.toLocaleString('es-AR', { maximumFractionDigits: 2 });
+
+function parseAmount(s){
+  s = String(s).trim().replace(/\s/g,'');
+  if (!s) return 0;
+  // "1.234,56" o "1234,56" estilo AR/BR; "1234.56" también se acepta
+  if (s.includes(',')) s = s.replace(/\./g,'').replace(',', '.');
+  else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g,'');
+  const n = parseFloat(s);
+  return isFinite(n) ? n : NaN;
+}
+
+// Pesos por cada real, para cada opción
+function arsPerBrl(id){
+  if (!rates) return null;
+  if (id === 'real') return rates.ars.real ?? null;
+  const usdArs = rates.ars[id];
+  if (!usdArs || !rates.usdBrl) return null;
+  return usdArs / rates.usdBrl;
+}
+
+function render(){
+  const brl = parseAmount($('brl').value);
+  const ok = isFinite(brl);
+  const rows = OPTIONS.map(o => {
+    const r = arsPerBrl(o.id);
+    if (r == null) return '';
+    const val = ok ? fmtARS(brl * r) : '—';
+    return `<button class="row" data-id="${o.id}" aria-pressed="${o.id===pick}">
+      <span class="dot"></span>
+      <span><b>${o.name}</b><span class="rate">R$ 1 = $ ${fmtRate(r)}${o.hint ? ' · '+o.hint : ''}</span></span>
+      <span class="val">${val}</span></button>`;
+  }).join('');
+  $('rows').innerHTML = rows || '<div class="row" style="cursor:default"><span></span><span class="sub">Sin datos todavía</span><span></span></div>';
+
+  let r = arsPerBrl(pick);
+  if (r == null){ const first = OPTIONS.find(o => arsPerBrl(o.id) != null); if (first){ pick = first.id; r = arsPerBrl(pick); } }
+  const opt = OPTIONS.find(o => o.id === pick);
+  $('arsLabel').textContent = 'Pesos · ' + (opt ? opt.name.replace('Vía dólar ','') : '');
+  $('ars').textContent = (r != null && ok) ? fmtARS(brl * r) : '—';
+  $('usd').textContent = (rates && rates.usdBrl && ok) ? fmtUSD(brl / rates.usdBrl) : '—';
+}
+
+async function getJSON(url){
+  const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 9000);
+  try{ const res = await fetch(url, { cache:'no-store', signal: ctrl.signal }); if (!res.ok) throw new Error(res.status); return await res.json(); }
+  finally{ clearTimeout(t); }
+}
+
+async function fetchUsdBrl(){
+  try{ const j = await getJSON('https://open.er-api.com/v6/latest/USD'); if (j.rates && j.rates.BRL) return j.rates.BRL; }catch(e){}
+  const j = await getJSON('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json');
+  return j.usd.brl;
+}
+
+async function update(){
+  $('status').classList.remove('err');
+  $('statusText').textContent = 'Buscando cotizaciones…';
+  const [dol, real, usdBrl] = await Promise.allSettled([
+    getJSON('https://dolarapi.com/v1/dolares'),
+    getJSON('https://dolarapi.com/v1/cotizaciones/brl'),
+    fetchUsdBrl(),
+  ]);
+  const next = { ars:{}, usdBrl:null, at:null, fetched: Date.now() };
+  if (dol.status === 'fulfilled' && Array.isArray(dol.value)){
+    for (const d of dol.value) if (d.venta) next.ars[d.casa] = d.venta;
+    next.at = dol.value.map(d => d.fechaActualizacion).filter(Boolean).sort().pop() || null;
+  }
+  if (real.status === 'fulfilled' && real.value && real.value.venta) next.ars.real = real.value.venta;
+  if (usdBrl.status === 'fulfilled') next.usdBrl = usdBrl.value;
+
+  const gotSomething = Object.keys(next.ars).length && (next.usdBrl || next.ars.real);
+  if (gotSomething){
+    // si una fuente falló, conservar el último dato guardado de esa fuente
+    if (rates){ next.usdBrl ??= rates.usdBrl; next.ars = { ...rates.ars, ...next.ars }; }
+    rates = next; store.set('rates', rates);
+    showStatus();
+  } else {
+    $('status').classList.add('err');
+    $('statusText').textContent = rates ? 'Sin conexión. Mostrando datos de ' + when(rates.fetched) : 'No pude conseguir cotizaciones. Revisá la conexión.';
+  }
+  render();
+}
+
+function when(ts){
+  const d = new Date(ts);
+  return d.toLocaleString('es-AR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+function showStatus(){
+  if (!rates) return;
+  const src = rates.at ? ' · cotización del ' + when(rates.at) : '';
+  $('statusText').textContent = 'Actualizado ' + when(rates.fetched) + src;
+}
+
+$('brl').addEventListener('input', render);
+$('brl').addEventListener('focus', e => e.target.select());
+$('rows').addEventListener('click', e => {
+  const b = e.target.closest('.row[data-id]'); if (!b) return;
+  pick = b.dataset.id; store.set('pick', pick); render();
+});
+$('refresh').addEventListener('click', update);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && (!rates || Date.now() - rates.fetched > 10*60*1000)) update();
+});
+
+render(); showStatus(); update();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
